@@ -1,0 +1,97 @@
+{
+  "name": "codex-powerline",
+  "version": "0.1.0",
+  "description": "A customizable Powerline status bar for the OpenAI Codex CLI",
+  "main": "./dist/codex-powerline.js",
+  "module": "./dist/codex-powerline.js",
+  "type": "module",
+  "bin": {
+    "codex-powerline": "./dist/codex-powerline.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/codex-powerline.js",
+      "default": "./dist/codex-powerline.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/",
+    "CHANGELOG.md",
+    "NOTICE",
+    "AUTHORS",
+    "configTemplates/",
+    "docs/powerline-preview.png",
+    "scripts/payload.example.json"
+  ],
+  "scripts": {
+    "start": "bun run src/codex-powerline.ts",
+    "build": "bun run scripts/build.ts",
+    "prepublishOnly": "bun run build",
+    "lint": "bun tsc --noEmit && eslint . --config eslint.config.js --max-warnings=0",
+    "lint:fix": "bun tsc --noEmit && eslint . --config eslint.config.js --max-warnings=0 --fix",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.2.3",
+    "@types/bun": "latest",
+    "@types/pluralize": "^0.0.33",
+    "@types/react": "^19.1.10",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "chalk": "^6.0.0",
+    "eslint": "^10.0.0",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import-newlines": "^2.0.0",
+    "eslint-plugin-import-x": "^4.16.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^17.3.0",
+    "ink": "6.2.0",
+    "ink-gradient": "^4.0.0",
+    "ink-select-input": "^6.2.0",
+    "pluralize": "^8.0.0",
+    "react": "19.3.1",
+    "strip-ansi": "^7.1.0",
+    "tinyglobby": "^0.2.14",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript-eslint": "^8.39.1",
+    "vitest": "^5.0.0",
+    "zod": "^4.0.17",
+    "@types/ws": "^8.18.1",
+    "react-devtools-core": "^8.0.0"
+  },
+  "keywords": [
+    "openai",
+    "codex",
+    "cli",
+    "status-line",
+    "powerline",
+    "terminal"
+  ],
+  "author": "Martin Hájek",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HajekMartin/codex-powerline.git"
+  },
+  "homepage": "https://github.com/HajekMartin/codex-powerline#readme",
+  "bugs": {
+    "url": "https://github.com/HajekMartin/codex-powerline/issues"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "trustedDependencies": [
+    "unrs-resolver",
+    "node-pty"
+  ],
+  "patchedDependencies": {
+    "ink@6.2.0": "patches/ink@6.2.0.patch"
+  },
+  "dependencies": {
+    "@xterm/headless": "^6.0.0",
+    "node-pty": "^1.1.0",
+    "ws": "^8.21.1"
+  }
+}

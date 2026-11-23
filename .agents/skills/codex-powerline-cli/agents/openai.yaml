@@ -1,0 +1,3 @@
+interface:
+  display_name: "Codex Powerline CLI Integration"
+  short_description: "Update MCP, App Server, and terminal integration"
