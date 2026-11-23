@@ -6,6 +6,7 @@ import {
     initConfigPath,
     loadSettings
 } from './utils/config';
+import { prepareMacFonts } from './utils/font-setup';
 import {
     GIT_REVIEW_REFRESH_FLAG,
     refreshGitReviewCacheFromCli
@@ -68,6 +69,8 @@ async function main(args: string[]): Promise<void> {
         return;
     }
     if (runIndex >= 0 && positionals.length === 0) {
+        if (process.stdin.isTTY && process.stdout.isTTY)
+            prepareMacFonts();
         const { launchCodex } = await import('./codex/launcher');
         const code = await launchCodex(args.slice(runIndex + 1));
         // On Windows ConPTY can keep handles active after the child exits.
@@ -80,6 +83,7 @@ async function main(args: string[]): Promise<void> {
     if (mode === 'configure') {
         if (!process.stdin.isTTY || !process.stdout.isTTY)
             throw new Error('The editor requires an interactive terminal.');
+        prepareMacFonts();
         if (process.env.CODEX_POWERLINE_DEV_RELOAD === '1') {
             const { getDevReloadMode, superviseDevReload } = await import('./utils/dev-reload');
             if (getDevReloadMode(process.env) === 'supervisor') {

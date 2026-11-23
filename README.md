@@ -60,6 +60,10 @@ If the separators look like boxes, try a Nerd Font in Windows Terminal.
 Install [Node.js 22.12 or newer](https://nodejs.org/en/download) if needed.
 Open Terminal and paste this block. Sign in, then save and exit the editor.
 
+The package includes a Nerd Font and installs it automatically. In Apple
+Terminal, setup selects it for your current profile; allow Terminal automation
+if macOS asks. Other terminal apps may require selecting the font in settings.
+
 ```sh
 npm install --global @openai/codex codex-powerline
 codex login
@@ -103,7 +107,7 @@ npm install --global codex-powerline@latest
 npm uninstall --global codex-powerline
 ```
 
-Uninstalling Powerline keeps Codex CLI and your saved layout.
+Uninstalling Powerline keeps Codex CLI, your saved layout, and installed fonts.
 
 ## ✨ Features
 

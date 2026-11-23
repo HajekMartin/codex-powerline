@@ -293,21 +293,18 @@ export const PowerlineSetup: React.FC<PowerlineSetupProps> = ({
                     <Box marginBottom={1} flexDirection='column'>
                         <Text bold>What will happen:</Text>
                         <Text>
-                            <Text dimColor>• Clone fonts from </Text>
-                            <Text color='blue'>https://github.com/powerline/fonts</Text>
+                            <Text dimColor>• Install the bundled MesloLGS Nerd Font Mono family</Text>
                         </Text>
                         {os.platform() === 'darwin' && (
                             <>
-                                <Text dimColor>• Run install.sh script which will:</Text>
-                                <Text dimColor>  - Copy all .ttf/.otf files to ~/Library/Fonts</Text>
-                                <Text dimColor>  - Register fonts with macOS</Text>
+                                <Text dimColor>• Copy the font files to ~/Library/Fonts</Text>
+                                <Text dimColor>• Select the font for this Apple Terminal profile</Text>
                             </>
                         )}
                         {os.platform() === 'linux' && (
                             <>
-                                <Text dimColor>• Run install.sh script which will:</Text>
-                                <Text dimColor>  - Copy all .ttf/.otf files to ~/.local/share/fonts</Text>
-                                <Text dimColor>  - Run fc-cache to update font cache</Text>
+                                <Text dimColor>• Copy the font files to ~/.local/share/fonts</Text>
+                                <Text dimColor>• Refresh the font cache when available</Text>
                             </>
                         )}
                         {os.platform() === 'win32' && (
@@ -316,19 +313,18 @@ export const PowerlineSetup: React.FC<PowerlineSetupProps> = ({
                                 <Text dimColor>  AppData\Local\Microsoft\Windows\Fonts</Text>
                             </>
                         )}
-                        <Text dimColor>• Clean up temporary files</Text>
+                        <Text dimColor>• No download, Git, or Homebrew required</Text>
                     </Box>
 
                     <Box marginBottom={1}>
                         <Text color='yellow' bold>Requirements: </Text>
-                        <Text dimColor>Git installed, Internet connection, Write permissions</Text>
+                        <Text dimColor>Write access to your user fonts folder</Text>
                     </Box>
 
                     <Box marginBottom={1} flexDirection='column'>
                         <Text color='green' bold>After install:</Text>
-                        <Text dimColor>• Restart terminal</Text>
-                        <Text dimColor>• Select a Powerline font</Text>
-                        <Text dimColor>  (e.g. "Meslo LG S for Powerline")</Text>
+                        <Text dimColor>• Apple Terminal is configured automatically when permitted</Text>
+                        <Text dimColor>• In other terminals, select MesloLGS Nerd Font Mono</Text>
                     </Box>
 
                     <Box marginTop={1}>
@@ -381,7 +377,7 @@ export const PowerlineSetup: React.FC<PowerlineSetupProps> = ({
                 </Box>
             ) : fontInstallMessage ? (
                 <Box flexDirection='column'>
-                    <Text color={fontInstallMessage.includes('success') ? 'green' : 'red'}>
+                    <Text color={fontInstallMessage.includes('success') || fontInstallMessage.includes('ready') ? 'green' : 'yellow'}>
                         {fontInstallMessage}
                     </Text>
                     <Box marginTop={1}>
@@ -395,13 +391,13 @@ export const PowerlineSetup: React.FC<PowerlineSetupProps> = ({
                             {'    Font Status: '}
                             {powerlineFontStatus.installed ? (
                                 <>
-                                    <Text color='green'>✓ Installed</Text>
-                                    <Text dimColor> - Ensure fonts are active in your terminal</Text>
+                                    <Text color='green'>{powerlineFontStatus.active ? '✓ Ready' : '✓ Font files found'}</Text>
+                                    <Text dimColor>{powerlineFontStatus.active ? ' - Terminal font configured' : ' - Active terminal font not verified; press (i) to set up'}</Text>
                                 </>
                             ) : (
                                 <>
                                     <Text color='yellow'>✗ Not Installed</Text>
-                                    <Text dimColor> - Press (i) to install Powerline fonts</Text>
+                                    <Text dimColor> - Press (i) to install the bundled Nerd Font</Text>
                                 </>
                             )}
                         </Text>

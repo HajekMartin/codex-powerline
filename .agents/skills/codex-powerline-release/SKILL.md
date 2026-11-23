@@ -30,6 +30,12 @@ checks the built Node entry point with `--version` and `--help`, and previews
 the npm upload. Check that the package includes `dist/codex-powerline.js`, its
 chunks, `LICENSE`, and `NOTICE`, and that the built version matches the manifest.
 
+For installer or font changes, also install the packed tarball with a temporary
+`HOME`, `CODEX_HOME`, and npm global prefix. Check that `assets/fonts/` and its
+licenses are packed, that macOS postinstall copies the bundled family, and that
+first launch repairs an installation made with `--ignore-scripts`. Use a
+throwaway Terminal profile for live font-selection checks.
+
 ## Publish
 
 When the user requests publishing, run:

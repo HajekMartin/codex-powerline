@@ -1,12 +1,14 @@
-import {
-    execFileSync,
-    execSync
-} from 'node:child_process';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
 import type { PowerlineFontStatus } from '../types/PowerlineFontStatus';
+
+import {
+    getBundledFontStatus,
+    installBundledFonts,
+    setupMacFonts
+} from './font-setup';
 
 // Re-export for backward compatibility
 export type { PowerlineFontStatus };
@@ -15,7 +17,7 @@ export type { PowerlineFontStatus };
 let fontsInstalledThisSession = false;
 
 /**
- * Check if Powerline fonts are installed by testing if Powerline symbols render correctly
+ * Detect installed font files; only terminal setup can confirm the active font
  */
 export function checkPowerlineFonts(): PowerlineFontStatus {
     // Debug mode: pretend fonts aren't installed (unless we installed them this session)
@@ -26,9 +28,13 @@ export function checkPowerlineFonts(): PowerlineFontStatus {
         };
     }
 
+    const bundled = getBundledFontStatus();
+    if (bundled.installed)
+        return bundled;
+
     try {
-        // Test if we can display the common Powerline separator symbols
-        // These are the key characters that require Powerline fonts
+        // Representative symbols for the font status display. Finding font
+        // files does not establish that the terminal selected one of them.
         const testSymbols = {
             rightArrow: '\uE0B0',     //
             rightThinArrow: '\uE0B1',  //
@@ -64,7 +70,7 @@ export function checkPowerlineFonts(): PowerlineFontStatus {
         // Common Powerline font patterns to look for
         const powerlineFontPatterns = [
             /powerline/i,
-            /nerd font/i,
+            /nerd.?font/i,
             /for powerline/i,
             /meslo.*lg/i,  // Meslo LG fonts often include Powerline
             /source.*code.*pro.*powerline/i,
@@ -159,171 +165,16 @@ export async function checkPowerlineFontsAsync(): Promise<PowerlineFontStatus> {
 /**
  * Install Powerline fonts on the system
  */
-export async function installPowerlineFonts(): Promise<{ success: boolean; message: string }> {
-    // Ensure this is always async
-    await Promise.resolve();
-
-    try {
-        const platform = os.platform();
-        let fontDir: string;
-
-        // Determine font directory based on platform
-        if (platform === 'darwin') {
-            fontDir = path.join(os.homedir(), 'Library', 'Fonts');
-        } else if (platform === 'linux') {
-            fontDir = path.join(os.homedir(), '.local', 'share', 'fonts');
-        } else if (platform === 'win32') {
-            fontDir = path.join(
-                os.homedir(),
-                'AppData',
-                'Local',
-                'Microsoft',
-                'Windows',
-                'Fonts'
-            );
-        } else {
-            return {
-                success: false,
-                message: 'Unsupported platform for font installation'
-            };
-        }
-
-        // Create font directory if it doesn't exist
-        if (!fs.existsSync(fontDir)) {
-            fs.mkdirSync(fontDir, { recursive: true });
-        }
-
-        // A new folder only this account can use for the download: os.tmpdir()
-        // is shared on Linux, and a folder another account created first would
-        // let it swap install.sh between the clone and running it
-        const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-powerline-fonts-'));
-
-        try {
-            // Clone Powerline fonts repository
-            execFileSync(
-                'git',
-                ['clone', '--depth=1', 'https://github.com/powerline/fonts.git', tempDir],
-                {
-                    stdio: 'pipe',
-                    encoding: 'utf8',
-                    windowsHide: true
-                }
-            );
-
-            // Run the install script based on platform
-            if (platform === 'darwin' || platform === 'linux') {
-                const installScript = path.join(tempDir, 'install.sh');
-
-                if (fs.existsSync(installScript)) {
-                    // Make script executable
-                    fs.chmodSync(installScript, 0o755);
-
-                    // Run install script
-                    execFileSync(installScript, [], {
-                        cwd: tempDir,
-                        stdio: 'pipe',
-                        encoding: 'utf8',
-                        windowsHide: true
-                    });
-
-                    // On Linux, update font cache
-                    if (platform === 'linux') {
-                        try {
-                            execSync('fc-cache -f -v', {
-                                stdio: 'pipe',
-                                encoding: 'utf8',
-                                windowsHide: true
-                            });
-                        } catch {
-                            // fc-cache might not be available
-                        }
-                    }
-
-                    // Mark as installed for DEBUG_FONT_INSTALL mode
-                    if (process.env.DEBUG_FONT_INSTALL === '1') {
-                        fontsInstalledThisSession = true;
-                    }
-
-                    return {
-                        success: true,
-                        message: 'Powerline fonts installed successfully! Please restart your terminal and select a Powerline font (e.g., "Source Code Pro for Powerline", "Meslo LG S for Powerline", etc.)'
-                    };
-                } else {
-                    throw new Error('Install script not found in Powerline fonts repository');
-                }
-            } else {
-                // For Windows, we need to copy font files manually
-                const fontFiles: string[] = [];
-
-                // Find all font files in the repository
-                function findFontFiles(dir: string): void {
-                    const files = fs.readdirSync(dir);
-                    for (const file of files) {
-                        const filePath = path.join(dir, file);
-                        const stat = fs.statSync(filePath);
-
-                        if (stat.isDirectory() && !file.startsWith('.')) {
-                            findFontFiles(filePath);
-                        } else if (file.endsWith('.ttf') || file.endsWith('.otf')) {
-                            // Only include fonts that have "Powerline" in their path
-                            if (filePath.toLowerCase().includes('powerline')) {
-                                fontFiles.push(filePath);
-                            }
-                        }
-                    }
-                }
-
-                findFontFiles(tempDir);
-
-                // Copy font files to Windows font directory
-                let installedCount = 0;
-                for (const fontFile of fontFiles) {
-                    const fileName = path.basename(fontFile);
-                    const destPath = path.join(fontDir, fileName);
-
-                    try {
-                        fs.copyFileSync(fontFile, destPath);
-                        installedCount++;
-                    } catch {
-                        // Ignore individual file errors
-                    }
-                }
-
-                if (installedCount > 0) {
-                    return {
-                        success: true,
-                        message: `Installed ${installedCount} Powerline fonts. Please restart your terminal and select a Powerline font from your terminal settings.`
-                    };
-                } else {
-                    throw new Error('No fonts were installed');
-                }
-            }
-        } finally {
-            // Clean up temporary directory
-            if (fs.existsSync(tempDir)) {
-                try {
-                    fs.rmSync(tempDir, { recursive: true, force: true });
-                } catch {
-                    // Ignore cleanup errors
-                }
-            }
-        }
-    } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-
-        // Provide helpful error messages
-        if (errorMessage.includes('git')) {
-            return {
-                success: false,
-                message: 'Git is required to install Powerline fonts. Please install Git and try again.'
-            };
-        }
-
-        return {
-            success: false,
-            message: `Failed to install Powerline fonts: ${errorMessage}. You can manually install fonts from: https://github.com/powerline/fonts`
-        };
-    }
+export function installPowerlineFonts(): Promise<{ success: boolean; message: string }> {
+    const result = process.platform === 'darwin'
+        ? (() => {
+            const status = setupMacFonts();
+            return { success: status.installed, message: status.message ?? 'Font setup finished.' };
+        })()
+        : installBundledFonts();
+    if (result.success && process.env.DEBUG_FONT_INSTALL === '1')
+        fontsInstalledThisSession = true;
+    return Promise.resolve(result);
 }
 
 /**
@@ -331,7 +182,7 @@ export async function installPowerlineFonts(): Promise<{ success: boolean; messa
  */
 export function getPowerlineStatusMessage(status: PowerlineFontStatus): string {
     if (status.installed) {
-        return `✓ Powerline fonts detected`;
+        return status.active ? '✓ Terminal font ready' : '✓ Font files detected; terminal font not verified';
     } else {
         return `✗ Powerline fonts not detected - some symbols may not display correctly`;
     }

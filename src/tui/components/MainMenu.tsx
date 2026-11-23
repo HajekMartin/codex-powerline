@@ -53,7 +53,7 @@ export function buildMainMenuItems(hasChanges: boolean): MainMenuEntry[] {
             label: '⚡ Powerline Setup',
             value: 'powerline',
             description:
-                'Install Powerline fonts for enhanced visual separators and symbols in your status line'
+                'Set up the bundled font and configure Powerline separators, caps, and themes'
         },
         '-',
         {

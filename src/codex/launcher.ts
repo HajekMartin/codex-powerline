@@ -10,6 +10,7 @@ import { getCodexLines } from '../utils/widgets';
 
 import { startBridge } from './bridge';
 import { codexCommand } from './command';
+import { preparePtyHelper } from './pty-helper';
 import { CodexTelemetry } from './telemetry';
 import { paintTerminal } from './terminal';
 
@@ -28,6 +29,7 @@ export async function launchCodex(args: string[]): Promise<number> {
     if (!executable)
         throw new Error('Could not find the Powerline renderer entry point.');
     const command = codexCommand();
+    preparePtyHelper();
     const settings = await loadSettings();
     const numLines = getCodexLines(settings.lines).filter(line => line.length > 0).length;
     const dimensions = () => {

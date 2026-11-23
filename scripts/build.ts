@@ -6,7 +6,7 @@ import {
 const outdir = 'dist';
 await rm(outdir, { recursive: true, force: true });
 const result = await Bun.build({
-    entrypoints: ['src/codex-powerline.ts'],
+    entrypoints: ['src/codex-powerline.ts', 'src/install.ts'],
     target: 'node',
     splitting: true,
     format: 'esm',

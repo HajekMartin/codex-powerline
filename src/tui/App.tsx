@@ -682,7 +682,7 @@ export const App: React.FC = () => {
                         onInstallFonts={() => {
                             setInstallingFonts(true);
                             // Add a small delay to allow React to render the "Installing..." message
-                            // before the blocking execSync calls in installPowerlineFonts
+                            // before font copying and terminal setup
                             setTimeout(() => {
                                 void installPowerlineFonts().then((result) => {
                                     setInstallingFonts(false);

@@ -17,6 +17,8 @@
   },
   "files": [
     "dist/",
+    "assets/fonts/",
+    "scripts/postinstall.mjs",
     "CHANGELOG.md",
     "NOTICE",
     "AUTHORS",
@@ -27,6 +29,7 @@
   "scripts": {
     "start": "bun run src/codex-powerline.ts",
     "build": "bun run scripts/build.ts",
+    "postinstall": "node scripts/postinstall.mjs",
     "prepublishOnly": "bun run build && node dist/codex-powerline.js --version && node dist/codex-powerline.js --help",
     "release": "bun install --frozen-lockfile && bun run lint && bun test && npm publish --access public",
     "release:dry-run": "bun run release --dry-run",
