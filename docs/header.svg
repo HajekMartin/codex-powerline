@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="608" height="88" viewBox="0 0 608 88" role="img" aria-labelledby="title">
+  <title id="title">Codex Powerline</title>
+  <!-- Matches the bold ink-gradient retro heading in src/tui/App.tsx. -->
+  <text y="64" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="64" font-weight="700" xml:space="preserve">
+    <tspan x="16" fill="rgb(63, 81, 177)">C</tspan>
+    <tspan x="54.4" fill="rgb(90, 85, 174)">o</tspan>
+    <tspan x="92.8" fill="rgb(123, 95, 172)">d</tspan>
+    <tspan x="131.2" fill="rgb(133, 101, 173)">e</tspan>
+    <tspan x="169.6" fill="rgb(143, 106, 174)">x</tspan>
+    <tspan x="208" fill="rgb(156, 106, 169)"> </tspan>
+    <tspan x="246.4" fill="rgb(168, 106, 164)">P</tspan>
+    <tspan x="284.8" fill="rgb(186, 107, 153)">o</tspan>
+    <tspan x="323.2" fill="rgb(204, 107, 142)">w</tspan>
+    <tspan x="361.6" fill="rgb(223, 119, 128)">e</tspan>
+    <tspan x="400" fill="rgb(241, 130, 113)">r</tspan>
+    <tspan x="438.4" fill="rgb(242, 147, 109)">l</tspan>
+    <tspan x="476.8" fill="rgb(243, 164, 105)">i</tspan>
+    <tspan x="515.2" fill="rgb(245, 183, 113)">n</tspan>
+    <tspan x="553.6" fill="rgb(247, 201, 120)">e</tspan>
+  </text>
+</svg>

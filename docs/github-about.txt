@@ -1,0 +1,1 @@
+🚀 A customizable Powerline status bar for OpenAI Codex CLI — ccstatusline rewritten for Codex, with flexible layouts, themes, and live model, context, usage-limit, and Git insights.

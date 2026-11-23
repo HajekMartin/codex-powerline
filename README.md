@@ -1,8 +1,10 @@
-# Codex Powerline
+# ![Codex Powerline](docs/header.svg)
 
 **A customizable Powerline status bar for the OpenAI Codex CLI.**
 
-See your model, context, usage limits, and Git state in your terminal.
+[ccstatusline](https://github.com/sirmalloc/ccstatusline), rewritten for Codex.
+See your model, context, usage limits, and Git state in your terminal, with
+flexible layouts, themes, and a live configuration preview.
 
 [![npm version](https://img.shields.io/npm/v/codex-powerline?logo=npm)](https://www.npmjs.com/package/codex-powerline)
 [![Monthly npm downloads](https://img.shields.io/npm/dm/codex-powerline?logo=npm)](https://www.npmjs.com/package/codex-powerline)
@@ -10,8 +12,6 @@ See your model, context, usage limits, and Git state in your terminal.
 [![Node.js: 22.12+](https://img.shields.io/badge/Node.js-22.12%2B-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 
 ![Two Powerline rows with the model, reasoning effort, Git branch, context usage, working directory, and usage limits](https://raw.githubusercontent.com/HajekMartin/codex-powerline/main/docs/powerline-preview.png)
-
-</div>
 
 ## Contents
 
@@ -150,8 +150,8 @@ bun run build
 
 **Martin Hájek** is the author and maintainer of Codex Powerline.
 
-Inspired by [ccstatusline](https://github.com/sirmalloc/ccstatusline), created
-by Matthew Breedlove. The first version was based on that project. See
+Based on [ccstatusline](https://github.com/sirmalloc/ccstatusline), created
+by Matthew Breedlove, and rewritten for the OpenAI Codex CLI. See
 [NOTICE](NOTICE) for the upstream attribution and [CHANGELOG.md](CHANGELOG.md)
 for release history.
 
