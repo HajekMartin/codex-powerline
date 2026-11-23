@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.0.0
 
+- First production release on npm.
 - Added an optional Workspace widget that shows the local project folder name,
   or the working folder name when no project folder is reported.
 - Added an optional Permissions widget for the active Codex permission profile

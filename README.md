@@ -1,22 +1,14 @@
-<div align="center">
-
 # Codex Powerline
 
 **A customizable Powerline status bar for the OpenAI Codex CLI.**
 
 See your model, context, usage limits, and Git state in your terminal.
 
-[![npm: not published](https://img.shields.io/badge/npm-not%20published-64748b?logo=npm)](#quick-start)
+[![npm version](https://img.shields.io/npm/v/codex-powerline?logo=npm)](https://www.npmjs.com/package/codex-powerline)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Node.js: 22.12+](https://img.shields.io/badge/Node.js-22.12%2B-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 
-<!-- After the first npm release, replace the npm status badge with:
-[![Monthly npm downloads](https://img.shields.io/npm/dm/codex-powerline?logo=npm)](https://www.npmjs.com/package/codex-powerline)
--->
-
-![Two Powerline rows with the model, reasoning effort, Git branch, context usage, working directory, and usage limits](docs/powerline-preview.png)
-
-</div>
+![Two Powerline rows with the model, reasoning effort, Git branch, context usage, working directory, and usage limits](https://raw.githubusercontent.com/HajekMartin/codex-powerline/main/docs/powerline-preview.png)
 
 ## Contents
 
@@ -31,23 +23,18 @@ See your model, context, usage limits, and Git state in your terminal.
 
 ## Quick Start
 
-Install [Codex CLI](https://developers.openai.com/codex/cli/), Node.js 22.12 or
-newer, and Bun. From this checkout:
+Install [Codex CLI](https://developers.openai.com/codex/cli/) and Node.js 22.12 or
+newer. Install [codex-powerline from npm](https://www.npmjs.com/package/codex-powerline):
 
 ```sh
-bun install --frozen-lockfile
-bun run build
-node dist/codex-powerline.js configure
-node dist/codex-powerline.js --config ./configTemplates/powerline.json run
+npm install --global codex-powerline
+codex-powerline configure
+codex-powerline run
 ```
 
 Use **Edit Lines** to add and reorder widgets. Open **Powerline Setup** to
 choose a theme and separators. The editor previews your changes as you make
 them. Press **Ctrl+S** to save, or choose **Save & Exit**.
-
-To put the command on your PATH, run `npm install -g .` after the build. Run
-`codex-powerline configure` to edit settings and `codex-powerline run` to launch
-the multiline footer.
 
 ## Features
 
@@ -58,20 +45,20 @@ the multiline footer.
 - **Codex metrics:** Display model, reasoning effort, context, tokens, cache,
   and 5-hour or weekly usage. A widget uses data from the active Codex session
   when that data is available.
-- **Project information:** Show Git or Jujutsu state, working directory, and
-  terminal details. Add your own text, links, or command output.
+- **Project and session information:** Show the workspace, working directory,
+  Git or Jujutsu state, and Codex permissions. Add your own text, links, or command output.
 - **Portable layouts:** Export a configuration as JSON. Import it later by
   merging it with your settings or replacing them.
 
 ## Windows Support
 
-The build and commands work in PowerShell. Use Windows Terminal and a
+The commands work in PowerShell. Use Windows Terminal and a
 Powerline-compatible or Nerd Font if arrow separators appear as boxes.
 If the launcher cannot find your Codex executable, give it the full path:
 
 ```powershell
 $env:CODEX_POWERLINE_CODEX = 'C:\path\to\codex.exe'
-node dist/codex-powerline.js run
+codex-powerline run
 ```
 
 ## Usage
@@ -84,8 +71,8 @@ node dist/codex-powerline.js run
 | `native` | Show the first nonempty row in Codex's own footer. Requires [Codex 0.171.0 or newer](https://github.com/openai/codex/releases/tag/rust-v0.171.0) and uses its MCP status line feature. |
 
 ```sh
-node dist/codex-powerline.js run resume --last
-node dist/codex-powerline.js --config ./configTemplates/powerline.json native
+codex-powerline run resume --last
+codex-powerline native
 ```
 
 Both modes forward Codex arguments and leave your Codex config file unchanged.
@@ -113,9 +100,9 @@ widgets from configurations you trust.
 
 ### Set up the native provider for regular Codex launches
 
-In your user `config.toml`, add these entries to the matching tables. Use
-absolute paths on Windows and point the command at `node.exe` instead of an npm
-shim:
+In your user `config.toml`, add these entries to the matching tables. Run
+`npm root --global` to find the installed package directory. Use an absolute
+path to `node.exe` on Windows if `node` is not on Codex's PATH:
 
 ```toml
 [features]
@@ -123,13 +110,15 @@ tui_extensions_statusline = true
 
 [mcp_servers.codex_powerline]
 command = "node"
-args = ["/absolute/path/to/dist/codex-powerline.js", "mcp"]
+args = ["/absolute/path/from/npm-root/codex-powerline/dist/codex-powerline.js", "mcp"]
 
 [tui]
 status_line_provider = { server = "codex_powerline", tool = "codex_powerline" }
 ```
 
 ### Render without Codex
+
+From a built checkout, use the example payload and preset:
 
 ```sh
 node dist/codex-powerline.js --config ./configTemplates/powerline.json render < scripts/payload.example.json
@@ -143,12 +132,15 @@ Use `CODEX_POWERLINE_WIDTH` to set the render width.
 
 ## Development
 
+To run from a checkout instead of npm, install Bun and run:
+
 ```sh
 bun install --frozen-lockfile
 bun run start configure
 bun test
 bun run lint
 bun run build
+node dist/codex-powerline.js --config ./configTemplates/powerline.json run
 ```
 
 See [AGENTS.md](AGENTS.md) for the project map and reusable development workflows.

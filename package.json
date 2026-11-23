@@ -1,7 +1,7 @@
 {
   "name": "codex-powerline",
-  "version": "0.1.0",
-  "description": "A customizable Powerline status bar for the OpenAI Codex CLI",
+  "version": "1.0.0",
+  "description": "Customizable terminal status bar for Codex CLI with model, usage limits, workspace, permissions, and Git widgets.",
   "main": "./dist/codex-powerline.js",
   "module": "./dist/codex-powerline.js",
   "type": "module",
