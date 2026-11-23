@@ -15,8 +15,10 @@ See your model, context, usage limits, and Git state in your terminal.
 
 ## Contents
 
-- [Install](#-install)
-- [Quick Start](#quick-start)
+- [Install, update, or uninstall](#install-update-or-uninstall)
+  - [Windows (PowerShell)](#windows-powershell)
+  - [macOS (Zsh)](#macos-zsh)
+  - [Linux (Bash)](#linux-bash)
 - [Features](#features)
 - [Usage](#usage)
 - [Contributing](#-contributing)
@@ -25,56 +27,160 @@ See your model, context, usage limits, and Git state in your terminal.
 - [Author and Acknowledgments](#author-and-acknowledgments)
 - [License](#license)
 
-## 🚀 Install
+## Install, update, or uninstall
 
-Install [Codex CLI](https://developers.openai.com/codex/cli/) and Node.js 22.12
-or newer. Install [codex-powerline from npm](https://www.npmjs.com/package/codex-powerline):
+### Windows (PowerShell)
 
-### 📦 npm
-
-```sh
-npm install --global codex-powerline
-```
-
-After the install, use `codex-powerline configure` to edit settings and
-`codex-powerline run` to start the multiline footer.
-
-### 🪟 Windows
-
-Run the npm command above in PowerShell. Then start the editor:
+**Install.** If you do not have Node.js 22.12 or newer, install Node.js LTS:
 
 ```powershell
-codex-powerline configure
+winget install --id OpenJS.NodeJS.LTS --exact --source winget
 ```
 
-Use Windows Terminal and a Powerline-compatible or Nerd Font if arrow
-separators appear as boxes. If the launcher cannot find Codex, set its full
-path before you start it:
+If `winget` is not available, run the [Node.js LTS Windows installer](https://nodejs.org/en/download).
+Open a new PowerShell window so it can find Node.js and npm.
+
+Paste this block. If you already have Codex CLI, skip the first line and use
+`codex login` if your install has no `codex.cmd`. If you are already signed
+in, skip the sign-in line. In the layout editor, choose **Save & Exit** to save
+your layout. The last command starts Codex with the Powerline footer.
+The `.cmd` commands also work when PowerShell blocks npm's `.ps1` shims.
+
+```powershell
+npm.cmd install --global @openai/codex@latest
+npm.cmd install --global codex-powerline@latest
+codex.cmd login
+codex-powerline.cmd configure
+codex-powerline.cmd run
+```
+
+If separators appear as boxes, use Windows Terminal with a Powerline-compatible
+font or Nerd Font. If Powerline cannot find your existing Codex executable,
+replace the example path below with its full path:
 
 ```powershell
 $env:CODEX_POWERLINE_CODEX = 'C:\path\to\codex.exe'
-codex-powerline run
+codex-powerline.cmd run
 ```
 
-### 🍎 macOS and 🐧 Linux
+**Update.** Exit the running Powerline session, then run:
 
-Run the npm command above in your terminal. Then start the editor:
+```powershell
+npm.cmd install --global codex-powerline@latest
+codex-powerline.cmd --version
+```
 
-```sh
+**Uninstall.** Exit the running Powerline session, then run:
+
+```powershell
+npm.cmd uninstall --global codex-powerline
+```
+
+This keeps Codex CLI, Node.js, and your saved layout. Run this only if you
+also want to delete the default Powerline settings and their backups:
+
+```powershell
+Remove-Item -LiteralPath "$HOME\.config\codex-powerline" -Recurse -Force
+```
+
+### macOS (Zsh)
+
+**Install.** If you do not have Node.js 22.12 or newer, install Node.js 24
+with [nvm](https://github.com/nvm-sh/nvm#installing-and-updating). If the nvm
+installer asks for the Xcode Command Line Tools, run `xcode-select --install`,
+finish the installer, then retry this block:
+
+```zsh
+touch "$HOME/.zshrc"
+curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.41.0/install.sh | PROFILE="$HOME/.zshrc" bash
+export NVM_DIR="${NVM_DIR:-${XDG_CONFIG_HOME:+$XDG_CONFIG_HOME/nvm}}"
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+. "$NVM_DIR/nvm.sh"
+nvm install 24
+```
+
+Paste this block. If you already have Codex CLI, skip the first line. If you
+are already signed in, skip the sign-in line. In the layout editor, choose
+**Save & Exit** to save your layout. The last command starts Codex with the
+Powerline footer.
+
+```zsh
+npm install --global @openai/codex@latest
+npm install --global codex-powerline@latest
+codex login
 codex-powerline configure
-```
-
-## Quick Start
-
-Use **Edit Lines** to add and reorder widgets. Open **Powerline Setup** to
-choose a theme and separators. The editor previews your changes as you make
-them. Press **Ctrl+S** to save, or choose **Save & Exit**.
-
-Start Codex with the Powerline layout:
-
-```sh
 codex-powerline run
 ```
+
+**Update.** Exit the running Powerline session, then run:
+
+```zsh
+npm install --global codex-powerline@latest
+codex-powerline --version
+```
+
+**Uninstall.** Exit the running Powerline session, then run:
+
+```zsh
+npm uninstall --global codex-powerline
+```
+
+This keeps Codex CLI, Node.js, and your saved layout. Run this only if you
+also want to delete the default Powerline settings and their backups:
+
+```zsh
+rm -r "$HOME/.config/codex-powerline"
+```
+
+### Linux (Bash)
+
+**Install.** If you do not have Node.js 22.12 or newer, install Node.js 24
+with [nvm](https://github.com/nvm-sh/nvm#installing-and-updating). This block
+uses `curl`. If it is missing, install it with your distribution's package
+manager first.
+
+```bash
+touch "$HOME/.bashrc"
+curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.41.0/install.sh | PROFILE="$HOME/.bashrc" bash
+export NVM_DIR="${NVM_DIR:-${XDG_CONFIG_HOME:+$XDG_CONFIG_HOME/nvm}}"
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+. "$NVM_DIR/nvm.sh"
+nvm install 24
+```
+
+Paste this block. If you already have Codex CLI, skip the first line. If you
+are already signed in, skip the sign-in line. In the layout editor, choose
+**Save & Exit** to save your layout. The last command starts Codex with the
+Powerline footer.
+
+```bash
+npm install --global @openai/codex@latest
+npm install --global codex-powerline@latest
+codex login
+codex-powerline configure
+codex-powerline run
+```
+
+**Update.** Exit the running Powerline session, then run:
+
+```bash
+npm install --global codex-powerline@latest
+codex-powerline --version
+```
+
+**Uninstall.** Exit the running Powerline session, then run:
+
+```bash
+npm uninstall --global codex-powerline
+```
+
+This keeps Codex CLI, Node.js, and your saved layout. Run this only if you
+also want to delete the default Powerline settings and their backups:
+
+```bash
+rm -r "$HOME/.config/codex-powerline"
+```
+
 ## Features
 
 - **Live preview:** Arrange widgets, set labels and colors, and preview each row
@@ -112,6 +218,10 @@ you sign in to Codex. The widget stays hidden if Codex does not report a name.
 Use **Current Working Dir** for the local path.
 
 ### Save or import a layout
+
+In `codex-powerline configure`, use **Edit Lines** to add and reorder widgets.
+Use **Powerline Setup** to choose a theme and separators. Press **Ctrl+S** to
+save, or choose **Save & Exit**.
 
 Settings live at `~/.config/codex-powerline/settings.json`, including on Windows.
 Pass `--config PATH` before the command to use another file. Start with the
