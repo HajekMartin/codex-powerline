@@ -1,13 +1,15 @@
 # Changelog
 
-## Unreleased
+## 1.0.1
 
-- Refresh the footer when Codex changes the model, reasoning effort, speed, or
+- Added `bun run release` and `bun run release:dry-run` to validate, build, and
+  publish the npm package, including checks of the built Node entry point.
+- Refreshes the footer when Codex changes the model, reasoning effort, speed, or
   working directory, without waiting for a new turn.
 
-## 1.0.0
+## 1.0.0 (staged)
 
-- First production release on npm.
+- Prepared the first production release for npm.
 - Added an optional widget that shows the selected ChatGPT workspace in `run` mode.
 - Removed the `native` and `mcp` commands. If you set up the former provider
   manually, remove its `mcp_servers.codex_powerline` table and the

@@ -11,6 +11,7 @@ assistant's runtime, config files, credentials, or transcript format.
 - Run the editor from source with `bun run start configure`.
 - Use `bun test <path>` for a focused check and `bun test` for the full suite.
 - Keep release notes in `CHANGELOG.md`, not in the README.
+- Keep npm publishing instructions in the release skill, not in the README.
 - Keep the README short. Give each supported platform one self-contained section
   with copy-paste commands for install, first launch, update, and uninstall.
   Link to prerequisite installers instead of duplicating their instructions.
@@ -40,3 +41,5 @@ supported local source. Keep README examples usable from an unpublished checkout
   add or change widgets, editor previews, themes, and renderer behavior.
 - [codex-powerline-cli](.agents/skills/codex-powerline-cli/SKILL.md):
   change or test the multiline launcher, App Server bridge, or telemetry adapter.
+- [codex-powerline-release](.agents/skills/codex-powerline-release/SKILL.md):
+  prepare versions and release notes, validate packages, and publish to npm.

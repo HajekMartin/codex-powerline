@@ -62,7 +62,7 @@ describe('installPowerlineFonts', () => {
         expect(cloneDirs).toHaveLength(1);
         const { dir, mode } = cloneDirs[0] ?? { dir: '', mode: 0 };
         expect(path.dirname(dir)).toBe(os.tmpdir());
-        expect(path.basename(dir)).toMatch(/^codex-powerline-powerline-fonts-/);
+        expect(path.basename(dir)).toMatch(/^codex-powerline-fonts-/);
         expect(mode).toBe(0o700);
         expect(mockExecFileSync.mock.calls[0]?.slice(0, 2)).toEqual(['git', ['clone', '--depth=1', FONTS_REPO, dir]]);
         expect(mockExecFileSync.mock.calls[1]?.[0]).toBe(path.join(dir, 'install.sh'));
