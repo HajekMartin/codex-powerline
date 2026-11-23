@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.0.0
 
+- First production release on npm.
 - Added an optional widget that shows the selected ChatGPT workspace in `run` mode.
 - Removed the `native` and `mcp` commands. If you set up the former provider
   manually, remove its `mcp_servers.codex_powerline` table and the

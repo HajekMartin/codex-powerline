@@ -1,16 +1,15 @@
-<div align="center">
-
 # Codex Powerline
 
 **A customizable Powerline status bar for the OpenAI Codex CLI.**
 
 See your model, context, usage limits, and Git state in your terminal.
 
+[![npm version](https://img.shields.io/npm/v/codex-powerline?logo=npm)](https://www.npmjs.com/package/codex-powerline)
 [![Monthly npm downloads](https://img.shields.io/npm/dm/codex-powerline?logo=npm)](https://www.npmjs.com/package/codex-powerline)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Node.js: 22.12+](https://img.shields.io/badge/Node.js-22.12%2B-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 
-![Two Powerline rows with the model, reasoning effort, Git branch, context usage, working directory, and usage limits](docs/powerline-preview.png)
+![Two Powerline rows with the model, reasoning effort, Git branch, context usage, working directory, and usage limits](https://raw.githubusercontent.com/HajekMartin/codex-powerline/main/docs/powerline-preview.png)
 
 </div>
 
@@ -29,12 +28,12 @@ See your model, context, usage limits, and Git state in your terminal.
 ## 🚀 Install
 
 Install [Codex CLI](https://developers.openai.com/codex/cli/) and Node.js 22.12
-or newer. Then install Codex Powerline with npm.
+or newer. Install [codex-powerline from npm](https://www.npmjs.com/package/codex-powerline):
 
 ### 📦 npm
 
 ```sh
-npm install -g codex-powerline
+npm install --global codex-powerline
 ```
 
 After the install, use `codex-powerline configure` to edit settings and
@@ -76,7 +75,6 @@ Start Codex with the Powerline layout:
 ```sh
 codex-powerline run
 ```
-
 ## Features
 
 - **Live preview:** Arrange widgets, set labels and colors, and preview each row
@@ -137,12 +135,15 @@ Use `CODEX_POWERLINE_WIDTH` to set the render width.
 
 ## Development
 
+To run from a checkout instead of npm, install Bun and run:
+
 ```sh
 bun install --frozen-lockfile
 bun run start configure
 bun test
 bun run lint
 bun run build
+node dist/codex-powerline.js --config ./configTemplates/powerline.json run
 ```
 
 See [AGENTS.md](AGENTS.md) for the project map and reusable development workflows.
