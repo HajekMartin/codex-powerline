@@ -2,6 +2,7 @@ import type { StatusJSON } from '../types/StatusJSON';
 
 type Json = Record<string, unknown>;
 type RequestId = number | string;
+type ChatStatus = NonNullable<StatusJSON['chat_status']>;
 
 const THREAD_OPEN = new Set(['thread/start', 'thread/resume', 'thread/fork']);
 const OBSERVED = new Set([...THREAD_OPEN, 'initialize', 'account/read', 'account/rateLimits/read', 'turn/start']);
@@ -16,6 +17,34 @@ function string(value: unknown): string | undefined {
 
 function approvalPolicy(value: unknown): string | undefined {
     return string(value) ?? ('granular' in object(value) ? 'granular' : undefined);
+}
+
+function turnOutcome(status: unknown): ChatStatus | undefined {
+    if (status === 'completed' || status === 'interrupted' || status === 'failed')
+        return status;
+    return undefined;
+}
+
+function threadStatus(value: unknown, previous: StatusJSON['chat_status']): ChatStatus | undefined {
+    const { type, activeFlags } = object(value);
+    switch (type) {
+        case 'active': {
+            const flags = Array.isArray(activeFlags) ? activeFlags : [];
+            if (flags.includes('waitingOnApproval'))
+                return 'waiting_for_approval';
+            if (flags.includes('waitingOnUserInput'))
+                return 'waiting_for_input';
+            return 'running';
+        }
+        case 'idle':
+            return turnOutcome(previous) ?? 'idle';
+        case 'systemError':
+            return 'failed';
+        case 'notLoaded':
+            return undefined;
+        default:
+            return previous ?? undefined;
+    }
 }
 
 function fastMode(tier: unknown): boolean | undefined {
@@ -52,6 +81,7 @@ function rateLimits(input: unknown): NonNullable<StatusJSON['rate_limits']> {
 export class CodexTelemetry {
     private readonly pending = new Map<RequestId, { method: string; switchIndex: number; values: Json }>();
     private readonly sessions = new Map<string, StatusJSON>();
+    private readonly latestTurnIds = new Map<string, string>();
     private active?: string;
     private readonly startedAt = new Map<string, number>();
     private switchIndex = 0;
@@ -109,6 +139,10 @@ export class CodexTelemetry {
             if (!threadId)
                 return;
             const session = this.session(threadId);
+            const lastTurn = Array.isArray(thread.turns) ? object(thread.turns.at(-1)) : {};
+            session.chat_status = threadStatus(thread.status, turnOutcome(lastTurn.status) ?? session.chat_status);
+            if (lastTurn.status === 'inProgress' && typeof lastTurn.id === 'string')
+                this.latestTurnIds.set(threadId, lastTurn.id);
             session.model = string(data.model);
             session.effort = { level: string(data.reasoningEffort) };
             session.cwd = string(data.cwd) ?? string(thread.cwd);
@@ -165,7 +199,27 @@ export class CodexTelemetry {
         if (!threadId)
             return;
         const session = this.session(threadId);
-        if (method === 'thread/settings/updated') {
+        if (method === 'thread/status/changed') {
+            session.chat_status = threadStatus(data.status, session.chat_status);
+            if (object(data.status).type === 'notLoaded')
+                this.latestTurnIds.delete(threadId);
+        } else if (method === 'turn/started') {
+            const turnId = string(object(data.turn).id);
+            if (turnId) {
+                this.latestTurnIds.set(threadId, turnId);
+                if (session.chat_status !== 'waiting_for_approval' && session.chat_status !== 'waiting_for_input')
+                    session.chat_status = 'running';
+            }
+        } else if (method === 'turn/completed') {
+            const turn = object(data.turn);
+            const turnId = string(turn.id);
+            const latestTurnId = this.latestTurnIds.get(threadId);
+            const outcome = turnOutcome(turn.status);
+            if (turnId && outcome && (!latestTurnId || latestTurnId === turnId)) {
+                this.latestTurnIds.set(threadId, turnId);
+                session.chat_status = outcome;
+            }
+        } else if (method === 'thread/settings/updated') {
             const settings = object(data.threadSettings);
             session.model = string(settings.model) ?? session.model;
             if (typeof settings.effort === 'string' || settings.effort === null)

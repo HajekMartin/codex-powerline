@@ -47,6 +47,7 @@ export const StatusJSONSchema = z.looseObject({
         session_name: z.string().optional()
     })),
     session_id: z.string().optional(),
+    chat_status: tolerant(z.enum(['idle', 'running', 'waiting_for_approval', 'waiting_for_input', 'completed', 'interrupted', 'failed'])),
     cwd: z.string().optional(),
     model: z.union([
         z.string(),

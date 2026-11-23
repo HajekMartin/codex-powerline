@@ -58,6 +58,7 @@ export { JjRevisionWidget } from './JjRevision';
 export { CodexAccountEmailWidget } from './CodexAccountEmail';
 export { FreeMemoryWidget } from './FreeMemory';
 export { SessionNameWidget } from './SessionName';
+export { ChatStatusWidget } from './ChatStatus';
 export { SessionUsageWidget } from './SessionUsage';
 export { WeeklyUsageWidget } from './WeeklyUsage';
 export { WeeklyLimitTimerWidget } from './WeeklyLimitTimer';

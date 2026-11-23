@@ -78,6 +78,7 @@ export const WIDGET_MANIFEST: WidgetManifestEntry[] = [
     { type: 'sandbox-status', create: () => new widgets.SandboxStatusWidget() },
     { type: 'permissions', create: () => new widgets.PermissionsWidget() },
     { type: 'session-name', create: () => new widgets.SessionNameWidget() },
+    { type: 'chat-status', create: () => new widgets.ChatStatusWidget() },
     { type: 'free-memory', create: () => new widgets.FreeMemoryWidget() },
     { type: 'session-usage', create: () => new widgets.SessionUsageWidget() },
     { type: 'weekly-usage', create: () => new widgets.WeeklyUsageWidget() },

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add the optional Chat Status widget (`chat-status`) for the active chat in
+  `codex-powerline run`. It shows when Codex is running, waiting for approval or
+  input, or has finished a turn.
+
 - Add Git Account (`git-account`) to show the active project’s configured Git
   email, falling back to its user name. Respects repository overrides and
   conditional includes; this identity can differ from push authentication.

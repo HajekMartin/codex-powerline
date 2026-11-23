@@ -18,6 +18,8 @@ assistant's runtime, config files, credentials, or transcript format.
 - Run `bun run lint` and `bun run build` before completing runtime changes.
 - Test the built Node entry point as well as source when you change a launch
   path. The published package runs on Node.js, while Bun builds it.
+- When the user asks to keep their macOS development install current, refresh
+  it after runtime changes using the local-install skill.
 - Use isolated settings and `CODEX_HOME` for integration checks. Do not write
   to the developer's Codex config just to smoke-test the provider.
 
@@ -41,5 +43,7 @@ supported local source. Keep README examples usable from an unpublished checkout
   add or change widgets, editor previews, themes, and renderer behavior.
 - [codex-powerline-cli](.agents/skills/codex-powerline-cli/SKILL.md):
   change or test the multiline launcher, App Server bridge, or telemetry adapter.
+- [codex-powerline-local-install](.agents/skills/codex-powerline-local-install/SKILL.md):
+  build, install, and verify the current checkout on macOS.
 - [codex-powerline-release](.agents/skills/codex-powerline-release/SKILL.md):
   prepare versions and release notes, validate packages, and publish to npm.

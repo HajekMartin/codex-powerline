@@ -7,6 +7,67 @@ import {
 import { CodexTelemetry } from '../telemetry';
 
 describe('Codex telemetry', () => {
+    it('follows live chat status, ignoring background threads and older turns', () => {
+        const telemetry = new CodexTelemetry('/project');
+        const notify = (method: string, params: Record<string, unknown>) => {
+            telemetry.response(JSON.stringify({ method, params: { threadId: 'visible', ...params } }));
+        };
+        const status = (type: string, activeFlags: string[] = [], threadId = 'visible') => {
+            notify('thread/status/changed', { threadId, status: { type, activeFlags } });
+        };
+        const turn = (method: string, id: string, status: string) => {
+            notify(method, { turn: { id, status } });
+        };
+        const chat = () => telemetry.snapshot().chat_status;
+
+        expect(chat()).toBeUndefined();
+        telemetry.request(JSON.stringify({ id: 1, method: 'thread/start' }));
+        telemetry.response(JSON.stringify({ id: 1, result: { thread: { id: 'visible', status: { type: 'idle' } } } }));
+        expect(chat()).toBe('idle');
+
+        turn('turn/started', 'first', 'inProgress');
+        expect(chat()).toBe('running');
+        status('active', ['waitingOnUserInput'], 'background');
+        expect(chat()).toBe('running');
+        status('active', ['waitingOnApproval']);
+        expect(chat()).toBe('waiting_for_approval');
+        status('active', ['waitingOnUserInput']);
+        expect(chat()).toBe('waiting_for_input');
+        status('active');
+        expect(chat()).toBe('running');
+        status('idle');
+        turn('turn/completed', 'first', 'completed');
+        expect(chat()).toBe('completed');
+
+        turn('turn/started', 'second', 'inProgress');
+        turn('turn/completed', 'first', 'completed');
+        expect(chat()).toBe('running');
+        turn('turn/completed', 'second', 'interrupted');
+        status('idle');
+        expect(chat()).toBe('interrupted');
+        turn('turn/started', 'third', 'inProgress');
+        turn('turn/completed', 'third', 'failed');
+        expect(chat()).toBe('failed');
+        status('notLoaded');
+        expect(chat()).toBeUndefined();
+    });
+
+    it('uses the resumed chat status and keeps active flags ahead of turn history', () => {
+        const telemetry = new CodexTelemetry('/project');
+        const resume = (id: number, threadId: string, status: Record<string, unknown>) => {
+            telemetry.request(JSON.stringify({ id, method: 'thread/resume', params: { threadId } }));
+            telemetry.response(JSON.stringify({
+                id,
+                result: { thread: { id: threadId, status, turns: [{ id: 'last', status: 'completed' }] } }
+            }));
+        };
+
+        resume(1, 'finished', { type: 'idle' });
+        expect(telemetry.snapshot().chat_status).toBe('completed');
+        resume(2, 'active', { type: 'active', activeFlags: ['waitingOnApproval'] });
+        expect(telemetry.snapshot().chat_status).toBe('waiting_for_approval');
+    });
+
     it('tracks the active TUI thread and keeps counters from other threads separate', () => {
         const telemetry = new CodexTelemetry('/default');
         telemetry.request(JSON.stringify({ id: 1, method: 'thread/start' }));
