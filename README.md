@@ -121,7 +121,7 @@ Uninstalling Powerline keeps Codex CLI, your saved layout, and installed fonts.
 - 🌿 **Stay oriented.** Show your working folder, Git or Jujutsu status, and Codex workspace and permissions.
 - 📦 **Take your layout with you.** Export your setup as JSON and import it on another machine.
 
-Import [Author’s Favorite](configTemplates/authors-favorite.json) for a single-row Catppuccin layout.
+Import [Author’s Favorite](configTemplates/authors-favorite.json) for a Catppuccin layout with four aligned columns for Codex, context, usage and workspace, and Git.
 
 ## Development
 

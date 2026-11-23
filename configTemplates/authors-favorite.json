@@ -4,22 +4,40 @@
   "defaultPadding": " ",
   "lines": [
     [
-      { "id": "model", "type": "model", "backgroundColor": "bgBrightBlack" },
+      { "id": "model", "type": "model", "backgroundColor": "bgBrightBlack", "merge": "no-padding" },
+      { "id": "model-space", "type": "custom-text", "customText": " " },
+      { "id": "context", "type": "context-bar", "backgroundColor": "bgGreen", "merge": "no-padding" },
+      { "id": "context-space", "type": "custom-text", "customText": " " },
+      { "id": "session", "type": "session-usage", "backgroundColor": "bgBrightRed", "metadata": { "invert": "true" }, "merge": "no-padding" },
+      { "id": "session-space", "type": "custom-text", "customText": " " },
+      { "id": "branch", "type": "git-branch", "backgroundColor": "bgBrightBlue" }
+    ],
+    [
       { "id": "effort", "type": "thinking-effort", "backgroundColor": "bgBrightGreen" },
-      { "id": "fast", "type": "fast-mode", "backgroundColor": "bgGreen", "metadata": { "nerdFont": "true" } },
-      { "id": "permissions", "type": "permissions", "backgroundColor": "bgBrightBlue" },
-      { "id": "chat", "type": "chat-status", "rawValue": true },
-      { "id": "context", "type": "context-bar", "backgroundColor": "bgGreen" },
       { "id": "compactions", "type": "compaction-counter", "backgroundColor": "bgBrightMagenta" },
-      { "id": "context-window", "type": "context-window", "backgroundColor": "bgGreen" },
-      { "id": "session", "type": "session-usage", "backgroundColor": "bgBrightRed", "metadata": { "invert": "true" } },
       { "id": "session-reset", "type": "reset-timer", "backgroundColor": "bgBlue", "metadata": { "display": "time" } },
-      { "id": "weekly", "type": "weekly-usage", "backgroundColor": "bgBrightBlack", "metadata": { "invert": "true" } },
-      { "id": "weekly-reset", "type": "weekly-reset-timer", "backgroundColor": "bgBrightMagenta" },
-      { "id": "workspace", "type": "workspace", "backgroundColor": "bgBrightGreen" },
-      { "id": "branch", "type": "git-branch", "backgroundColor": "bgBrightBlue" },
-      { "id": "changes", "type": "git-changes", "backgroundColor": "bgBrightCyan" },
+      { "id": "changes", "type": "git-changes", "backgroundColor": "bgBrightCyan" }
+    ],
+    [
+      { "id": "fast", "type": "fast-mode", "backgroundColor": "bgGreen", "metadata": { "nerdFont": "true" }, "merge": "no-padding" },
+      { "id": "fast-space", "type": "custom-text", "customText": " " },
+      { "id": "context-window", "type": "context-window", "backgroundColor": "bgGreen", "merge": "no-padding" },
+      { "id": "context-window-space", "type": "custom-text", "customText": " " },
+      { "id": "weekly", "type": "weekly-usage", "backgroundColor": "bgBrightBlack", "metadata": { "invert": "true" }, "merge": "no-padding" },
+      { "id": "weekly-space", "type": "custom-text", "customText": " " },
       { "id": "git-account", "type": "git-account", "backgroundColor": "bgCyan" }
+    ],
+    [
+      { "id": "permissions", "type": "permissions", "backgroundColor": "bgBrightBlue", "merge": "no-padding" },
+      { "id": "permissions-space", "type": "custom-text", "customText": " " },
+      { "id": "context-row-4-space", "type": "custom-text", "customText": " " },
+      { "id": "weekly-reset", "type": "weekly-reset-timer", "backgroundColor": "bgBrightMagenta" }
+    ],
+    [
+      { "id": "chat", "type": "chat-status", "rawValue": true, "merge": "no-padding" },
+      { "id": "chat-space", "type": "custom-text", "customText": " " },
+      { "id": "context-row-5-space", "type": "custom-text", "customText": " " },
+      { "id": "workspace", "type": "workspace", "backgroundColor": "bgBrightGreen" }
     ]
   ],
   "powerline": {
@@ -27,6 +45,7 @@
     "separators": ["\uE0B0"],
     "startCaps": ["\uE0B6"],
     "endCaps": ["\uE0B4"],
-    "theme": "catppuccin"
+    "theme": "catppuccin",
+    "autoAlign": true
   }
 }
