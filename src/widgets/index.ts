@@ -1,4 +1,5 @@
 export { ModelWidget } from './Model';
+export { GitAccountWidget } from './GitAccount';
 export { GitBranchWidget } from './GitBranch';
 export { GitChangesWidget } from './GitChanges';
 export { GitInsertionsWidget } from './GitInsertions';

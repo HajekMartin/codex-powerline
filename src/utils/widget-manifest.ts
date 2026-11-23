@@ -18,6 +18,7 @@ export interface LayoutWidgetManifestEntry {
 
 export const WIDGET_MANIFEST: WidgetManifestEntry[] = [
     { type: 'model', create: () => new widgets.ModelWidget() },
+    { type: 'git-account', create: () => new widgets.GitAccountWidget() },
     { type: 'git-branch', create: () => new widgets.GitBranchWidget() },
     { type: 'git-changes', create: () => new widgets.GitChangesWidget() },
     { type: 'git-insertions', create: () => new widgets.GitInsertionsWidget() },

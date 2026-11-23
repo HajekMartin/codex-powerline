@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add Git Account (`git-account`) to show the active project’s configured Git
+  email, falling back to its user name. Respects repository overrides and
+  conditional includes; this identity can differ from push authentication.
+
 - Bundle MesloLGS Nerd Font Mono and its licenses. macOS npm installation
   installs the font offline and selects it for the calling Apple Terminal
   profile, with a first-launch retry when install scripts were skipped.
