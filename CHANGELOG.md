@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Added an optional Workspace widget that shows the local project folder name,
+  or the working folder name when no project folder is reported.
+- Added an optional Permissions widget for the active Codex permission profile
+  or sandbox mode and approval policy.
+
 ## 0.1.0
 
 - Adapted the editor, renderer, and layout format from the MIT-licensed

@@ -43,6 +43,8 @@ export { CustomTextWidget } from './CustomText';
 export { CustomSymbolWidget } from './CustomSymbol';
 export { CustomCommandWidget } from './CustomCommand';
 export { CurrentWorkingDirWidget } from './CurrentWorkingDir';
+export { WorkspaceWidget } from './Workspace';
+export { PermissionsWidget } from './Permissions';
 export { CodexThreadIdWidget } from './CodexThreadId';
 export { JjBookmarksWidget } from './JjBookmarks';
 export { JjWorkspaceWidget } from './JjWorkspace';

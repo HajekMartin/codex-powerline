@@ -14,6 +14,10 @@ function string(value: unknown): string | undefined {
     return typeof value === 'string' ? value : undefined;
 }
 
+function approvalPolicy(value: unknown): string | undefined {
+    return string(value) ?? ('granular' in object(value) ? 'granular' : undefined);
+}
+
 function number(value: unknown): number | undefined {
     return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 }
@@ -66,8 +70,8 @@ export class CodexTelemetry {
             return;
         if (THREAD_OPEN.has(method))
             this.switchIndex++;
-        const { cwd, threadId, model, effort, sandboxPolicy, serviceTier, serviceTierForTurn, collaborationMode } = object(params);
-        this.pending.set(id, { method, switchIndex: this.switchIndex, values: { cwd, threadId, model, effort, sandboxPolicy, serviceTier, serviceTierForTurn, collaborationMode } });
+        const { cwd, threadId, model, effort, sandboxPolicy, approvalPolicy, serviceTier, serviceTierForTurn, collaborationMode } = object(params);
+        this.pending.set(id, { method, switchIndex: this.switchIndex, values: { cwd, threadId, model, effort, sandboxPolicy, approvalPolicy, serviceTier, serviceTierForTurn, collaborationMode } });
     }
 
     response(line: string): void {
@@ -102,7 +106,13 @@ export class CodexTelemetry {
             session.fast_mode = typeof data.serviceTier === 'string' ? data.serviceTier === 'fast' : undefined;
             if (typeof thread.createdAt === 'number')
                 this.startedAt.set(threadId, thread.createdAt * 1000);
-            session.codex = { ...session.codex, session_name: string(thread.name), sandbox: string(object(data.sandbox).type) };
+            session.codex = {
+                ...session.codex,
+                session_name: string(thread.name),
+                sandbox: string(object(data.sandbox).type),
+                permission_profile: string(object(data.activePermissionProfile).id),
+                approval_policy: approvalPolicy(data.approvalPolicy)
+            };
             if (this.switchIndex === request.switchIndex)
                 this.active = threadId;
         } else if (request.method === 'turn/start') {
@@ -117,7 +127,10 @@ export class CodexTelemetry {
             session.cwd = string(values.cwd) ?? session.cwd;
             const sandbox = string(object(values.sandboxPolicy).type);
             if (sandbox)
-                session.codex = { ...session.codex, sandbox };
+                session.codex = { ...session.codex, sandbox, permission_profile: undefined };
+            const approval = approvalPolicy(values.approvalPolicy);
+            if (approval)
+                session.codex = { ...session.codex, approval_policy: approval };
             const tier = string(values.serviceTierForTurn) ?? string(values.serviceTier);
             if (tier)
                 session.fast_mode = tier === 'fast';
@@ -135,7 +148,15 @@ export class CodexTelemetry {
         if (!threadId)
             return;
         const session = this.session(threadId);
-        if (method === 'thread/tokenUsage/updated') {
+        if (method === 'thread/settings/updated') {
+            const settings = object(data.threadSettings);
+            session.codex = {
+                ...session.codex,
+                sandbox: string(object(settings.sandboxPolicy).type),
+                permission_profile: string(object(settings.activePermissionProfile).id),
+                approval_policy: approvalPolicy(settings.approvalPolicy)
+            };
+        } else if (method === 'thread/tokenUsage/updated') {
             const usage = object(data.tokenUsage);
             const total = object(usage.total);
             const last = object(usage.last);

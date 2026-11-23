@@ -40,4 +40,38 @@ describe('Codex telemetry', () => {
         telemetry.response(update('codex', 50, 60));
         expect(telemetry.snapshot().rate_limits).toEqual({});
     });
+
+    it('tracks confirmed permissions per thread and clears the old profile when the sandbox changes', () => {
+        const telemetry = new CodexTelemetry('/project');
+        telemetry.request(JSON.stringify({ id: 1, method: 'thread/start' }));
+        telemetry.response(JSON.stringify({
+            id: 1,
+            result: {
+                thread: { id: 'visible' }, sandbox: { type: 'workspaceWrite' },
+                activePermissionProfile: { id: ':workspace' }, approvalPolicy: 'on-request'
+            }
+        }));
+        const update = (threadId: string) => {
+            telemetry.response(JSON.stringify({
+                method: 'thread/settings/updated',
+                params: {
+                    threadId,
+                    threadSettings: { sandboxPolicy: { type: 'readOnly' }, activePermissionProfile: null, approvalPolicy: { granular: {} } }
+                }
+            }));
+        };
+
+        update('background');
+        expect(telemetry.snapshot().codex).toMatchObject({
+            sandbox: 'workspaceWrite',
+            permission_profile: ':workspace',
+            approval_policy: 'on-request'
+        });
+        update('visible');
+        expect(telemetry.snapshot().codex).toMatchObject({
+            sandbox: 'readOnly',
+            permission_profile: undefined,
+            approval_policy: 'granular'
+        });
+    });
 });

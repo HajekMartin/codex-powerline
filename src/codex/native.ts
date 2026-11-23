@@ -56,7 +56,12 @@ const stateSchema = z.object({
         id: z.string(),
         name: z.string().nullish(),
         workspace: z.object({ cwd: z.string() }),
-        permissions: z.object({ type: z.string() }).optional(),
+        permissions: z.object({
+            type: z.string(),
+            profile_id: z.string().optional(),
+            display_name: z.string().optional()
+        }).optional(),
+        approval: z.object({ policy: z.string() }).optional(),
         model: z.object({
             id: z.string().optional(),
             display_name: z.string().optional(),
@@ -113,6 +118,9 @@ export function fromNativeState(input: unknown): StatusJSON {
         codex: {
             session_name: thread.name ?? undefined,
             sandbox: thread.permissions?.type === 'disabled' ? 'dangerFullAccess' : thread.permissions?.type,
+            permission_profile: thread.permissions?.profile_id,
+            permission_display_name: thread.permissions?.display_name,
+            approval_policy: thread.approval?.policy,
             total_tokens: total ? total.total_input_tokens + total.output_tokens : undefined,
             input_tokens: total?.total_input_tokens,
             output_tokens: total?.output_tokens,

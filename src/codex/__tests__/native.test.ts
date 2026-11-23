@@ -23,6 +23,8 @@ describe('Native status line', () => {
             thread: {
                 id: 'thread-1', workspace: { cwd: '/workspace' },
                 model: { id: 'gpt', reasoning_level: 'high' },
+                permissions: { type: 'managed', profile_id: ':workspace', display_name: 'Workspace' },
+                approval: { policy: 'on-request' },
                 usage: {
                     context: { context_window_size: 100000, used_tokens: 56000, used_percentage: 50 },
                     total: { total_input_tokens: 100, output_tokens: 20, cache_read_input_tokens: 50, cache_write_input_tokens: 25 },
@@ -34,7 +36,10 @@ describe('Native status line', () => {
         expect(data).toMatchObject({
             context_window: { current_usage: 56000, used_percentage: 50 },
             rate_limits: { five_hour: { used_percentage: 24, resets_at: 123 }, seven_day: { used_percentage: 57 } },
-            codex: { total_tokens: 120, cached_input_tokens: 50 },
+            codex: {
+                total_tokens: 120, cached_input_tokens: 50, sandbox: 'managed',
+                permission_profile: ':workspace', permission_display_name: 'Workspace', approval_policy: 'on-request'
+            },
             cost: { total_cost_usd: 0.25 }
         });
     });
