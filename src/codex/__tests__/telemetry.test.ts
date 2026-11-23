@@ -41,6 +41,37 @@ describe('Codex telemetry', () => {
         expect(telemetry.snapshot().rate_limits).toEqual({});
     });
 
+    it('tracks the selected ChatGPT workspace and ignores an account reply from before a switch', () => {
+        const telemetry = new CodexTelemetry('/project');
+        const read = (id: number) => {
+            telemetry.request(JSON.stringify({ id, method: 'account/read' }));
+        };
+        const reply = (id: number, workspaceName: string | null) => {
+            telemetry.response(JSON.stringify({ id, result: { account: { type: 'chatgpt', planType: 'business', workspaceName } } }));
+        };
+        const workspace = () => telemetry.snapshot().codex?.account_workspace_name;
+
+        read(1);
+        reply(1, 'Example Company');
+        expect(workspace()).toBe('Example Company');
+
+        read(2);
+        telemetry.response(JSON.stringify({ method: 'account/updated', params: { authMode: 'chatgpt', reason: 'workspaceRoutingReady' } }));
+        expect(workspace()).toBe('Example Company');
+
+        telemetry.response(JSON.stringify({ method: 'account/updated', params: { authMode: 'chatgpt' } }));
+        reply(2, 'Example Company');
+        expect(workspace()).toBeUndefined();
+
+        read(3);
+        reply(3, 'Another Company');
+        expect(workspace()).toBe('Another Company');
+
+        read(4);
+        reply(4, null);
+        expect(workspace()).toBeUndefined();
+    });
+
     it('tracks confirmed permissions per thread and clears the old profile when the sandbox changes', () => {
         const telemetry = new CodexTelemetry('/project');
         telemetry.request(JSON.stringify({ id: 1, method: 'thread/start' }));

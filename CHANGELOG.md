@@ -2,8 +2,10 @@
 
 ## Unreleased
 
-- Added an optional Workspace widget that shows the local project folder name,
-  or the working folder name when no project folder is reported.
+- Added an optional widget that shows the selected ChatGPT workspace in `run` mode.
+- Removed the `native` and `mcp` commands. If you set up the former provider
+  manually, remove its `mcp_servers.codex_powerline` table and the
+  `tui.status_line_provider` entry that points to it. `run` needs neither setting.
 - Added an optional Permissions widget for the active Codex permission profile
   or sandbox mode and approval policy.
 

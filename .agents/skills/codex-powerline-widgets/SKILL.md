@@ -1,6 +1,6 @@
 ---
 name: codex-powerline-widgets
-description: Add or change Codex Powerline widgets, Powerline themes, renderer layout, and widget previews or controls in the Ink editor. Use for widget settings compatibility and display bugs, not Codex App Server or MCP protocol work.
+description: Add or change Codex Powerline widgets, Powerline themes, renderer layout, and widget previews or controls in the Ink editor. Use for widget settings compatibility and display bugs, not Codex App Server protocol work.
 ---
 
 # Codex Powerline widgets
@@ -19,6 +19,5 @@ description: Add or change Codex Powerline widgets, Powerline themes, renderer l
    from the built CLI with `scripts/payload.example.json`. For a layout bug,
    include both Powerline and plain layouts when both share the changed path.
 
-The preview and the live renderer both use the widget registry. Native MCP
-uses the first nonempty rendered row and converts its styles to Codex UI
-nodes. The multiline mode prints ANSI rows and supports OSC 8 links.
+The preview and the live renderer both use the widget registry. The launcher
+prints ANSI rows and supports OSC 8 links.

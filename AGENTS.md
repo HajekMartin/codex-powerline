@@ -22,7 +22,7 @@ assistant's runtime, config files, credentials, or transcript format.
 | Area | Location |
 | --- | --- |
 | CLI and shared renderer | `src/codex-powerline.ts`, `src/utils/status-render.ts`, `src/utils/renderer.ts` |
-| Native MCP and multiline CLI | `src/codex/` |
+| Multiline CLI and App Server bridge | `src/codex/` |
 | Ink editor and preview | `src/tui/` |
 | Widgets and registry | `src/widgets/`, `src/utils/widget-manifest.ts` |
 | Settings schema and migrations | `src/types/Settings.ts`, `src/utils/config.ts`, `src/utils/migrations.ts` |
@@ -36,4 +36,4 @@ supported local source. Keep README examples usable from an unpublished checkout
 - [codex-powerline-widgets](.agents/skills/codex-powerline-widgets/SKILL.md):
   add or change widgets, editor previews, themes, and renderer behavior.
 - [codex-powerline-cli](.agents/skills/codex-powerline-cli/SKILL.md):
-  change or test the native MCP provider, multiline launcher, or telemetry adapters.
+  change or test the multiline launcher, App Server bridge, or telemetry adapter.

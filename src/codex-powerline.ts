@@ -19,10 +19,8 @@ import {
 const help = `Usage: codex-powerline [--config PATH] [COMMAND]
 
   configure          Edit and preview the status line (default in a terminal)
-  native [CODEX ARGS] Start Codex with its native Powerline provider (0.171+)
-  run [CODEX ARGS]   Start the multiline wrapper (also works on older Codex)
+  run [CODEX ARGS]   Start Codex with the Powerline status bar
   render             Render a JSON status payload read from stdin
-  mcp                Serve the native status line over MCP stdio
   --version          Show the package version
 `;
 
@@ -35,7 +33,7 @@ async function main(args: string[]): Promise<void> {
         return;
     }
 
-    const runIndex = args.findIndex((arg, index) => (arg === 'run' || arg === 'native') && args[index - 1] !== '--config');
+    const runIndex = args.findIndex((arg, index) => arg === 'run' && args[index - 1] !== '--config');
     const cliArgs = runIndex === -1 ? args : args.slice(0, runIndex);
     const { values, positionals } = parseArgs({
         args: cliArgs,
@@ -70,18 +68,11 @@ async function main(args: string[]): Promise<void> {
         return;
     }
     if (runIndex >= 0 && positionals.length === 0) {
-        const passthrough = args.slice(runIndex + 1);
-        if (args[runIndex] === 'native') {
-            const { launchCodexNative } = await import('./codex/native');
-            process.exitCode = await launchCodexNative(passthrough);
-        } else {
-            const { launchCodex } = await import('./codex/launcher');
-            const code = await launchCodex(passthrough);
-            // On Windows ConPTY can keep native handles active after the child exits.
-            // The launcher has already flushed the terminal and closed its app server.
-            process.exit(code);
-        }
-        return;
+        const { launchCodex } = await import('./codex/launcher');
+        const code = await launchCodex(args.slice(runIndex + 1));
+        // On Windows ConPTY can keep handles active after the child exits.
+        // The launcher has already flushed the terminal and closed its app server.
+        process.exit(code);
     }
     if (positionals.length > 1 || runIndex >= 0)
         throw new Error(help);
@@ -98,9 +89,6 @@ async function main(args: string[]): Promise<void> {
         }
         const { runTUI } = await import('./tui');
         runTUI();
-    } else if (mode === 'mcp') {
-        const { serveNative } = await import('./codex/native');
-        await serveNative();
     } else if (mode === 'render') {
         process.stdin.setEncoding('utf8');
         const chunks: string[] = [];

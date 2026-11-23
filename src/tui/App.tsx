@@ -490,7 +490,7 @@ export const App: React.FC = () => {
                 )}
                 {screen === 'runHelp' && (
                     <Box flexDirection='column'>
-                        <Text>Launch Codex with: codex-powerline native</Text>
+                        <Text>Launch Codex with: codex-powerline run</Text>
                         <Text dimColor>Use codex-powerline run for multiple rows or older Codex releases.</Text>
                         <Text dimColor>The launcher does not change your Codex configuration.</Text>
                         <List items={NOTICE_ITEMS} onSelect={() => { setScreen('main'); }} />

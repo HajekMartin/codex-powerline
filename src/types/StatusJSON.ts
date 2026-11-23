@@ -38,6 +38,7 @@ export const StatusJSONSchema = z.looseObject({
         last_cached_input_tokens: CoercedNumberSchema.optional(),
         last_cache_write_input_tokens: CoercedNumberSchema.optional(),
         account_email: z.string().optional(),
+        account_workspace_name: z.string().optional(),
         sandbox: z.string().optional(),
         permission_profile: z.string().optional(),
         permission_display_name: z.string().optional(),

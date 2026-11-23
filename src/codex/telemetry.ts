@@ -50,6 +50,7 @@ export class CodexTelemetry {
     private readonly startedAt = new Map<string, number>();
     private switchIndex = 0;
     private accountEmail?: string;
+    private accountWorkspaceName?: string;
     private limits?: StatusJSON['rate_limits'];
     private version?: string;
 
@@ -91,7 +92,9 @@ export class CodexTelemetry {
             // The TUI uses the same Codex executable as the app server.
             this.version = string(data.userAgent)?.match(/\/([\d][\w.+-]*)/)?.[1];
         } else if (request.method === 'account/read') {
-            this.accountEmail = string(object(data.account).email);
+            const account = object(data.account);
+            this.accountEmail = string(account.email);
+            this.accountWorkspaceName = account.type === 'chatgpt' ? string(account.workspaceName) : undefined;
         } else if (request.method === 'account/rateLimits/read') {
             this.limits = rateLimits(object(data.rateLimitsByLimitId).codex ?? data.rateLimits);
         } else if (THREAD_OPEN.has(request.method)) {
@@ -138,6 +141,16 @@ export class CodexTelemetry {
     }
 
     private notification(method: string, data: Json): void {
+        if (method === 'account/updated') {
+            if (data.reason !== 'workspaceRoutingReady') {
+                this.accountWorkspaceName = undefined;
+                for (const [id, request] of this.pending) {
+                    if (request.method === 'account/read')
+                        this.pending.delete(id);
+                }
+            }
+            return;
+        }
         if (method === 'account/rateLimits/updated') {
             const limits = object(data.rateLimits);
             if (!limits.limitId || limits.limitId === 'codex')
@@ -201,7 +214,11 @@ export class CodexTelemetry {
             cwd: active?.cwd ?? this.cwd,
             version: this.version,
             rate_limits: this.limits,
-            codex: { ...active?.codex, account_email: this.accountEmail }
+            codex: {
+                ...active?.codex,
+                account_email: this.accountEmail,
+                account_workspace_name: this.accountWorkspaceName
+            }
         };
     }
 }

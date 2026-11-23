@@ -333,7 +333,7 @@ describe('App main menu highlight across Ctrl+S', () => {
             expect(rendered.getFrame()).not.toContain('💾 Save & Exit');
             expect(rendered.getFrame()).toContain('▶  Run with Codex');
 
-            await pressKey(rendered, KEYS.enter, 'Launch Codex with: codex-powerline native');
+            await pressKey(rendered, KEYS.enter, 'Launch Codex with: codex-powerline run');
         } finally {
             rendered.cleanup();
         }
