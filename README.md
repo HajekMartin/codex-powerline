@@ -1,3 +1,5 @@
+<div align="center">
+
 # ![Codex Powerline](docs/header.svg)
 
 **A customizable Powerline status bar for the OpenAI Codex CLI.**
@@ -12,6 +14,8 @@ flexible layouts, themes, and a live configuration preview.
 [![Node.js: 22.12+](https://img.shields.io/badge/Node.js-22.12%2B-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 
 ![Two Powerline rows with the model, reasoning effort, Git branch, context usage, working directory, and usage limits](https://raw.githubusercontent.com/HajekMartin/codex-powerline/main/docs/powerline-preview.png)
+
+</div>
 
 ## Contents
 

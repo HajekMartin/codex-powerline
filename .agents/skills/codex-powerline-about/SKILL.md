@@ -37,8 +37,15 @@ gh repo view HajekMartin/codex-powerline --json description --jq .description
 
 Verify that the returned description matches the file. Change only the
 description unless the user also requests website or topic changes. If `gh`
-is unavailable or authentication fails, report that the live About remains
-unchanged and provide the prepared text or command. Do not claim that saving
-or pushing the file updates GitHub.
+is unavailable, the GitHub REST API is an alternative: GET and PATCH
+`https://api.github.com/repos/HajekMartin/codex-powerline`, sending only the
+`description` field. Use available GitHub authentication; an existing HTTPS
+Git credential can be obtained with `git credential fill` and kept in memory.
+Never print credentials or put them in files or command arguments. Verify
+the description with a fresh GET after the update.
+
+If authentication or the update fails, report the live state accurately and
+provide the prepared text or command. Do not claim that saving or pushing
+the file updates GitHub.
 
 GitHub CLI reference: https://cli.github.com/manual/gh_repo_edit
