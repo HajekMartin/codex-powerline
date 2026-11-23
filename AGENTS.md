@@ -11,6 +11,9 @@ assistant's runtime, config files, credentials, or transcript format.
 - Run the editor from source with `bun run start configure`.
 - Use `bun test <path>` for a focused check and `bun test` for the full suite.
 - Keep release notes in `CHANGELOG.md`, not in the README.
+- Keep the README short. Give each supported platform one self-contained section
+  with copy-paste commands for install, first launch, update, and uninstall.
+  Link to prerequisite installers instead of duplicating their instructions.
 - Run `bun run lint` and `bun run build` before completing runtime changes.
 - Test the built Node entry point as well as source when you change a launch
   path. The published package runs on Node.js, while Bun builds it.
