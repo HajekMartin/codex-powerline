@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Refresh the footer when Codex changes the model, reasoning effort, speed, or
+  working directory, without waiting for a new turn.
+
 ## 1.0.0
 
 - First production release on npm.

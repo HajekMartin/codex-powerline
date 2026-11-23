@@ -18,6 +18,12 @@ function approvalPolicy(value: unknown): string | undefined {
     return string(value) ?? ('granular' in object(value) ? 'granular' : undefined);
 }
 
+function fastMode(tier: unknown): boolean | undefined {
+    if (tier === null)
+        return false;
+    return typeof tier === 'string' ? tier === 'fast' || tier === 'priority' : undefined;
+}
+
 function number(value: unknown): number | undefined {
     return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 }
@@ -106,7 +112,7 @@ export class CodexTelemetry {
             session.model = string(data.model);
             session.effort = { level: string(data.reasoningEffort) };
             session.cwd = string(data.cwd) ?? string(thread.cwd);
-            session.fast_mode = typeof data.serviceTier === 'string' ? data.serviceTier === 'fast' : undefined;
+            session.fast_mode = fastMode(data.serviceTier);
             if (typeof thread.createdAt === 'number')
                 this.startedAt.set(threadId, thread.createdAt * 1000);
             session.codex = {
@@ -134,9 +140,7 @@ export class CodexTelemetry {
             const approval = approvalPolicy(values.approvalPolicy);
             if (approval)
                 session.codex = { ...session.codex, approval_policy: approval };
-            const tier = string(values.serviceTierForTurn) ?? string(values.serviceTier);
-            if (tier)
-                session.fast_mode = tier === 'fast';
+            session.fast_mode = fastMode(string(values.serviceTierForTurn) ?? values.serviceTier) ?? session.fast_mode;
         }
     }
 
@@ -163,6 +167,11 @@ export class CodexTelemetry {
         const session = this.session(threadId);
         if (method === 'thread/settings/updated') {
             const settings = object(data.threadSettings);
+            session.model = string(settings.model) ?? session.model;
+            if (typeof settings.effort === 'string' || settings.effort === null)
+                session.effort = { level: string(settings.effort) };
+            session.cwd = string(settings.cwd) ?? session.cwd;
+            session.fast_mode = fastMode(settings.serviceTier) ?? session.fast_mode;
             session.codex = {
                 ...session.codex,
                 sandbox: string(object(settings.sandboxPolicy).type),

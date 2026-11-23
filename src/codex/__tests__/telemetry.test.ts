@@ -72,6 +72,45 @@ describe('Codex telemetry', () => {
         expect(workspace()).toBeUndefined();
     });
 
+    it('updates the active thread model, effort, speed, and directory without a new turn', () => {
+        const telemetry = new CodexTelemetry('/project');
+        telemetry.request(JSON.stringify({ id: 1, method: 'thread/start' }));
+        telemetry.response(JSON.stringify({
+            id: 1,
+            result: { thread: { id: 'visible' }, model: 'gpt-6.2-sol', reasoningEffort: 'medium', cwd: '/project' }
+        }));
+        const update = (threadId: string, threadSettings: Record<string, unknown>) => {
+            telemetry.response(JSON.stringify({
+                method: 'thread/settings/updated',
+                params: { threadId, threadSettings }
+            }));
+        };
+
+        const changed = { model: 'gpt-6.2-astra', effort: 'low', serviceTier: 'priority', cwd: '/other' };
+        update('background', changed);
+        expect(telemetry.snapshot()).toMatchObject({
+            model: 'gpt-6.2-sol',
+            effort: { level: 'medium' },
+            cwd: '/project'
+        });
+
+        update('visible', changed);
+        expect(telemetry.snapshot()).toMatchObject({
+            model: 'gpt-6.2-astra',
+            effort: { level: 'low' },
+            cwd: '/other',
+            fast_mode: true
+        });
+
+        update('visible', { model: 'gpt-6.2-sol', effort: null, serviceTier: null, cwd: '/project' });
+        expect(telemetry.snapshot()).toMatchObject({
+            model: 'gpt-6.2-sol',
+            effort: { level: undefined },
+            cwd: '/project',
+            fast_mode: false
+        });
+    });
+
     it('tracks confirmed permissions per thread and clears the old profile when the sandbox changes', () => {
         const telemetry = new CodexTelemetry('/project');
         telemetry.request(JSON.stringify({ id: 1, method: 'thread/start' }));
