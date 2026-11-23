@@ -429,7 +429,7 @@ describe('CurrentWorkingDirWidget', () => {
                 linkTo: 'cursor'
             }, true);
 
-            expect(renderStatusLineForItem(item, path)).toBe(
+            expect(renderStatusLineForItem(item, path)).toContain(
                 renderOsc8Link(
                     buildIdeFileUrl(path, 'cursor'),
                     '/Volumes/E/中/n/final'

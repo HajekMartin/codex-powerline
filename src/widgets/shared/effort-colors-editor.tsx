@@ -182,7 +182,7 @@ export const EffortColorsEditor: React.FC<WidgetEditorProps> = ({ widget, onComp
     // Colored as the status line colors it: the widget color around the level's runs
     const sample = applyColors(
         formatThinkingEffort(draft, { text: sampleLevel, level: sampleLevel }, colors),
-        baseColor,
+        colors.colorsDisabled ? undefined : baseColor,
         undefined,
         false,
         colors.colorLevel,

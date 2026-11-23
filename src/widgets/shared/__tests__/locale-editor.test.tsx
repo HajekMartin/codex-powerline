@@ -78,8 +78,9 @@ async function search(rendered: { stdin: NodeJS.ReadStream; stdout: CapturedWrit
     rendered.stdout.clearOutput();
     rendered.stdin.write(query);
     await waitFor(() => {
-        expect(rendered.stdout.getOutput()).toContain(query);
-        expect(rendered.stdout.getOutput()).toContain(expected);
+        const output = getPlainOutput(rendered.stdout.getOutput());
+        expect(output).toContain(`Search: ${query}`);
+        expect(output).toContain(expected);
     });
 }
 
@@ -238,16 +239,16 @@ describe('UsageLocaleEditor', () => {
 
     // The System and Configured rows take the place of the common row for
     // their locale, so the keyword has to find them too
-    it.each<[string, string, Record<string, string>]>([
-        ['system', 'en-GB', {}],
-        ['configured', DEFAULT_RESET_LOCALE, { locale: 'en-GB' }]
-    ])('saves the %s locale a search keyword names', async (_row, systemLocale, metadata) => {
+    it.each<[string, string, Record<string, string>, string]>([
+        ['system', 'en-GB', {}, 'System (en-GB) - Current system locale'],
+        ['configured', DEFAULT_RESET_LOCALE, { locale: 'en-GB' }, 'en-GB - Configured locale']
+    ])('saves the %s locale a search keyword names', async (_row, systemLocale, metadata, expected) => {
         stubSystemLocale(systemLocale);
         const rendered = renderEditor({ id: 'reset', type: 'reset-timer', metadata });
 
         try {
             await waitForEditor(rendered.stdout);
-            await search(rendered, 'uk', 'Use uk');
+            await search(rendered, 'uk', expected);
 
             rendered.stdin.write('\r');
             await waitFor(() => {

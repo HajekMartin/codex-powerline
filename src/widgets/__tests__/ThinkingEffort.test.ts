@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import {
     describe,
     expect,
@@ -14,6 +15,7 @@ import {
     DEFAULT_SETTINGS,
     type Settings
 } from '../../types/Settings';
+import { updateColorMap } from '../../utils/colors';
 import {
     calculateMaxWidthsFromPreRendered,
     preRenderAllWidgets,
@@ -255,7 +257,16 @@ describe('ThinkingEffortWidget', () => {
         });
 
         it('colors nothing at the No Color level', () => {
-            expect(renderLine(levelColored, { colorLevel: 0 })).toBe('Thinking: xhigh');
+            const originalLevel = chalk.level;
+            try {
+                // The CLI and editor set Chalk before calling the renderer.
+                chalk.level = 0;
+                updateColorMap();
+                expect(renderLine(levelColored, { colorLevel: 0 })).toBe('Thinking: xhigh');
+            } finally {
+                chalk.level = originalLevel;
+                updateColorMap();
+            }
         });
     });
 });
