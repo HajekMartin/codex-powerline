@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.3
+
+- Add the Empty widget to leave a gap that shows the terminal background
+  without changing Powerline alignment. Use it in the Author’s Favorite preset.
+- Match the Permissions widget to Codex’s standard modes: Ask for approval,
+  Approve for me, Full Access, and Read Only.
+- Document the Codex skill that creates and previews a Powerline layout from
+  a plain-language request without opening the interactive editor.
+
 ## 1.0.2
 
 - Add the optional Chat Status widget (`chat-status`) for the active chat in
