@@ -84,7 +84,7 @@ export function renderCodexStatus(
     for (const [lineIndex, items] of lines.entries()) {
         const widgets = rendered[lineIndex] ?? [];
         const line = renderStatusLine(items, settings, { ...context, lineIndex, globalSeparatorIndex, globalPowerlineThemeIndex, globalPowerlineStartCapIndex }, widgets, maxWidths);
-        if (!getVisibleText(line).trim())
+        if (!getVisibleText(line).trim() && !widgets.some(({ widget, content }) => widget.reserveSpace && content))
             continue;
         output.push(sanitizeTerminalText(line).replaceAll('\n', ' '));
         globalSeparatorIndex = advanceGlobalSeparatorIndex(globalSeparatorIndex, items, widgets);
