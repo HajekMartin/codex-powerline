@@ -107,8 +107,12 @@ export class CodexTelemetry {
             return;
         if (THREAD_OPEN.has(method))
             this.switchIndex++;
-        const { cwd, threadId, model, effort, sandboxPolicy, approvalPolicy, serviceTier, serviceTierForTurn, collaborationMode } = object(params);
-        this.pending.set(id, { method, switchIndex: this.switchIndex, values: { cwd, threadId, model, effort, sandboxPolicy, approvalPolicy, serviceTier, serviceTierForTurn, collaborationMode } });
+        const { cwd, threadId, model, effort, sandboxPolicy, approvalPolicy, approvalsReviewer, serviceTier, serviceTierForTurn, collaborationMode } = object(params);
+        this.pending.set(id, {
+            method,
+            switchIndex: this.switchIndex,
+            values: { cwd, threadId, model, effort, sandboxPolicy, approvalPolicy, approvalsReviewer, serviceTier, serviceTierForTurn, collaborationMode }
+        });
     }
 
     response(line: string): void {
@@ -154,7 +158,8 @@ export class CodexTelemetry {
                 session_name: string(thread.name),
                 sandbox: string(object(data.sandbox).type),
                 permission_profile: string(object(data.activePermissionProfile).id),
-                approval_policy: approvalPolicy(data.approvalPolicy)
+                approval_policy: approvalPolicy(data.approvalPolicy),
+                approvals_reviewer: string(data.approvalsReviewer)
             };
             if (this.switchIndex === request.switchIndex)
                 this.active = threadId;
@@ -174,6 +179,9 @@ export class CodexTelemetry {
             const approval = approvalPolicy(values.approvalPolicy);
             if (approval)
                 session.codex = { ...session.codex, approval_policy: approval };
+            const reviewer = string(values.approvalsReviewer);
+            if (reviewer)
+                session.codex = { ...session.codex, approvals_reviewer: reviewer };
             session.fast_mode = fastMode(string(values.serviceTierForTurn) ?? values.serviceTier) ?? session.fast_mode;
         }
     }
@@ -230,7 +238,8 @@ export class CodexTelemetry {
                 ...session.codex,
                 sandbox: string(object(settings.sandboxPolicy).type),
                 permission_profile: string(object(settings.activePermissionProfile).id),
-                approval_policy: approvalPolicy(settings.approvalPolicy)
+                approval_policy: approvalPolicy(settings.approvalPolicy),
+                approvals_reviewer: string(settings.approvalsReviewer)
             };
         } else if (method === 'thread/tokenUsage/updated') {
             const usage = object(data.tokenUsage);

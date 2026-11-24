@@ -43,6 +43,7 @@ export const StatusJSONSchema = z.looseObject({
         permission_profile: z.string().optional(),
         permission_display_name: z.string().optional(),
         approval_policy: z.string().optional(),
+        approvals_reviewer: z.string().optional().catch(undefined),
         compactions: CoercedNumberSchema.optional(),
         session_name: z.string().optional()
     })),

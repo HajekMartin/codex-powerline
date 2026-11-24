@@ -179,7 +179,7 @@ describe('Codex telemetry', () => {
             id: 1,
             result: {
                 thread: { id: 'visible' }, sandbox: { type: 'workspaceWrite' },
-                activePermissionProfile: { id: ':workspace' }, approvalPolicy: 'on-request'
+                activePermissionProfile: { id: ':workspace' }, approvalPolicy: 'on-request', approvalsReviewer: 'auto_review'
             }
         }));
         const update = (threadId: string) => {
@@ -187,7 +187,10 @@ describe('Codex telemetry', () => {
                 method: 'thread/settings/updated',
                 params: {
                     threadId,
-                    threadSettings: { sandboxPolicy: { type: 'readOnly' }, activePermissionProfile: null, approvalPolicy: { granular: {} } }
+                    threadSettings: {
+                        sandboxPolicy: { type: 'readOnly' }, activePermissionProfile: null,
+                        approvalPolicy: { granular: {} }, approvalsReviewer: 'user'
+                    }
                 }
             }));
         };
@@ -196,13 +199,29 @@ describe('Codex telemetry', () => {
         expect(telemetry.snapshot().codex).toMatchObject({
             sandbox: 'workspaceWrite',
             permission_profile: ':workspace',
-            approval_policy: 'on-request'
+            approval_policy: 'on-request',
+            approvals_reviewer: 'auto_review'
         });
         update('visible');
         expect(telemetry.snapshot().codex).toMatchObject({
             sandbox: 'readOnly',
             permission_profile: undefined,
-            approval_policy: 'granular'
+            approval_policy: 'granular',
+            approvals_reviewer: 'user'
         });
+    });
+
+    it('tracks a turn approval reviewer only after the server accepts the turn', () => {
+        const telemetry = new CodexTelemetry('/project');
+        telemetry.request(JSON.stringify({ id: 1, method: 'thread/start' }));
+        telemetry.response(JSON.stringify({ id: 1, result: { thread: { id: 'visible' }, approvalsReviewer: 'user' } }));
+
+        telemetry.request(JSON.stringify({ id: 2, method: 'turn/start', params: { threadId: 'visible', approvalsReviewer: 'auto_review' } }));
+        telemetry.response(JSON.stringify({ id: 2, error: { code: -32602, message: 'Invalid params' } }));
+        expect(telemetry.snapshot().codex?.approvals_reviewer).toBe('user');
+
+        telemetry.request(JSON.stringify({ id: 3, method: 'turn/start', params: { threadId: 'visible', approvalsReviewer: 'auto_review' } }));
+        telemetry.response(JSON.stringify({ id: 3, result: { turn: { id: 'new-turn' } } }));
+        expect(telemetry.snapshot().codex?.approvals_reviewer).toBe('auto_review');
     });
 });

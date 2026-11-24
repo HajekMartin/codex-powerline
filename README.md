@@ -8,10 +8,21 @@
 See your model, context, usage limits, and Git state in your terminal, with
 flexible layouts, themes, and a live configuration preview.
 
+Give a ⭐ if this project helped you!
+
+[![GitHub stars](https://img.shields.io/github/stars/HajekMartin/codex-powerline?style=social)](https://github.com/HajekMartin/codex-powerline)
+[![GitHub forks](https://img.shields.io/github/forks/HajekMartin/codex-powerline?style=social)](https://github.com/HajekMartin/codex-powerline/forks)
+[![GitHub watchers](https://img.shields.io/github/watchers/HajekMartin/codex-powerline?style=social)](https://github.com/HajekMartin/codex-powerline)
+
 [![npm version](https://img.shields.io/npm/v/codex-powerline?logo=npm)](https://www.npmjs.com/package/codex-powerline)
 [![Monthly npm downloads](https://img.shields.io/npm/dm/codex-powerline?logo=npm)](https://www.npmjs.com/package/codex-powerline)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Made with Bun](https://img.shields.io/badge/Made%20with-Bun-000000?logo=bun)](https://bun.sh/)
 [![Node.js: 22.12+](https://img.shields.io/badge/Node.js-22.12%2B-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+
+[![GitHub issues](https://img.shields.io/github/issues/HajekMartin/codex-powerline)](https://github.com/HajekMartin/codex-powerline/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/HajekMartin/codex-powerline)](https://github.com/HajekMartin/codex-powerline/pulls)
+[![GitHub contributors](https://img.shields.io/github/contributors/HajekMartin/codex-powerline)](https://github.com/HajekMartin/codex-powerline/graphs/contributors)
 
 ![Two Powerline rows with the model, reasoning effort, Git branch, context usage, working directory, and usage limits](https://raw.githubusercontent.com/HajekMartin/codex-powerline/main/docs/powerline-preview.png)
 
