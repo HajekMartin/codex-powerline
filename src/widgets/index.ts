@@ -46,6 +46,7 @@ export { CustomCommandWidget } from './CustomCommand';
 export { CurrentWorkingDirWidget } from './CurrentWorkingDir';
 export { WorkspaceWidget } from './Workspace';
 export { PermissionsWidget } from './Permissions';
+export { EmptyWidget } from './Empty';
 export { CodexThreadIdWidget } from './CodexThreadId';
 export { JjBookmarksWidget } from './JjBookmarks';
 export { JjWorkspaceWidget } from './JjWorkspace';

@@ -30,13 +30,13 @@
     [
       { "id": "permissions", "type": "permissions", "backgroundColor": "bgBrightBlue", "merge": "no-padding" },
       { "id": "permissions-space", "type": "custom-text", "customText": " " },
-      { "id": "context-row-4-space", "type": "custom-text", "customText": " " },
+      { "id": "context-row-4-space", "type": "empty" },
       { "id": "weekly-reset", "type": "weekly-reset-timer", "backgroundColor": "bgBrightMagenta" }
     ],
     [
       { "id": "chat", "type": "chat-status", "rawValue": true, "merge": "no-padding" },
       { "id": "chat-space", "type": "custom-text", "customText": " " },
-      { "id": "context-row-5-space", "type": "custom-text", "customText": " " },
+      { "id": "context-row-5-space", "type": "empty" },
       { "id": "workspace", "type": "workspace", "backgroundColor": "bgBrightGreen" }
     ]
   ],

@@ -70,6 +70,7 @@ export const WIDGET_MANIFEST: WidgetManifestEntry[] = [
     { type: 'terminal-width', create: () => new widgets.TerminalWidthWidget() },
     { type: 'version', create: () => new widgets.VersionWidget() },
     { type: 'custom-text', create: () => new widgets.CustomTextWidget() },
+    { type: 'empty', create: () => new widgets.EmptyWidget() },
     { type: 'custom-symbol', create: () => new widgets.CustomSymbolWidget() },
     { type: 'custom-command', create: () => new widgets.CustomCommandWidget() },
     { type: 'link', create: () => new widgets.LinkWidget() },

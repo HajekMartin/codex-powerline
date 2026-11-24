@@ -289,7 +289,6 @@ function renderPowerlineStatusLine(
             const trailingPadding = omitTrailingPadding ? '' : sideTrailingPadding;
             const paddedText = `${leadingPadding}${widgetText}${trailingPadding}`;
 
-            // Determine colors
             let fgColor = widget.color ?? defaultColor;
             let bgColor = widget.backgroundColor;
 
@@ -303,8 +302,7 @@ function renderPowerlineStatusLine(
                 }
                 bgColor = themeColors.bg[widgetColorIndex % themeColors.bg.length] ?? bgColor;
 
-                // Only increment color index if this widget is not merged with the next one
-                // This ensures merged widgets share the same color
+                // Merged widgets share the same color.
                 if (!mergesWithNext) {
                     widgetColorIndex++;
                 }
@@ -318,10 +316,12 @@ function renderPowerlineStatusLine(
                 fgColor = settings.overrideForegroundColor;
             }
 
+            // An empty cell still takes its place in the theme and column layout.
+            const isEmpty = widget.type === 'empty';
             widgetElements.push({
                 content: paddedText,
-                bgColor: bgColor ?? undefined,  // Make sure undefined, not empty string
-                fgColor: fgColor,
+                bgColor: isEmpty ? undefined : bgColor,
+                fgColor: isEmpty ? undefined : fgColor,
                 mergesWithNext,
                 originalIndex: actualPreRenderedIndex ?? -1,
                 widget: widget
@@ -483,7 +483,7 @@ function renderPowerlineStatusLine(
                     const fgCode = getColorAnsiCode(capFg, colorLevel, false);
                     result += fgCode + segmentStartCap + '\x1b[39m';
                 } else {
-                    result += segmentStartCap;
+                    result += widget.widget.type === 'empty' ? ' '.repeat(getVisibleWidth(segmentStartCap)) : segmentStartCap;
                 }
             }
         }
@@ -573,7 +573,7 @@ function renderPowerlineStatusLine(
                     const fgCode = getColorAnsiCode(capFg, colorLevel, false);
                     result += fgCode + segmentEndCap + '\x1b[39m';
                 } else {
-                    result += segmentEndCap;
+                    result += widget.widget.type === 'empty' ? ' '.repeat(getVisibleWidth(segmentEndCap)) : segmentEndCap;
                 }
             }
             if (shouldBold) {
@@ -665,7 +665,12 @@ function renderPowerlineStatusLine(
                 }
             }
 
-            result += separatorOutput;
+            // Keep the boundary width without drawing a glyph across an uncolored gap.
+            const isBlankBoundary = !widget.bgColor && !nextWidget.bgColor
+                && (widget.widget.type === 'empty' || nextWidget.widget.type === 'empty');
+            result += isBlankBoundary
+                ? ' '.repeat(getVisibleWidth(separator))
+                : separatorOutput;
 
             // Reset bold/dim after separator if either was set
             if (shouldBold || shouldDim) {
@@ -692,7 +697,7 @@ function renderPowerlineStatusLine(
                 const fgCode = getColorAnsiCode(capFg, colorLevel, false);
                 result += fgCode + segmentEndCap + '\x1b[39m';
             } else {
-                result += segmentEndCap;
+                result += lastWidget?.widget.type === 'empty' ? ' '.repeat(getVisibleWidth(segmentEndCap)) : segmentEndCap;
             }
 
             // Reset bold/dim after end cap if needed
@@ -1249,7 +1254,7 @@ export function renderStatusLine(
                     const colorsOwnRuns = widgetColorsOnlyItsRuns(widget);
                     const text = colorsOwnRuns && hasForegroundOverride(settings) ? stripSgrCodes(widgetText) : widgetText;
                     elements.push({
-                        content: applyColorsWithOverride(text, widget.color ?? defaultColor, widget.backgroundColor, widget.bold, widget.dim, colorsOwnRuns),
+                        content: widget.type === 'empty' ? text : applyColorsWithOverride(text, widget.color ?? defaultColor, widget.backgroundColor, widget.bold, widget.dim, colorsOwnRuns),
                         type: widget.type,
                         widget,
                         mergesWithNext: Boolean(widget.merge) && !mergeEndsAtEmptyWidget(i)
@@ -1348,7 +1353,7 @@ export function renderStatusLine(
             const hasColorOverride = Boolean(settings.overrideBackgroundColor && settings.overrideBackgroundColor !== 'none')
                 || Boolean(settings.overrideForegroundColor && settings.overrideForegroundColor !== 'none');
 
-            if (padding && (elem.widget?.backgroundColor || hasColorOverride)) {
+            if (padding && elem.type !== 'empty' && (elem.widget?.backgroundColor || hasColorOverride)) {
                 // Apply colors to padding - applyColorsWithOverride will handle the overrides
                 const leadingPadding = omitLeadingPadding || !sideLeadingPadding ? '' : applyColorsWithOverride(sideLeadingPadding, undefined, elem.widget?.backgroundColor);
                 const trailingPadding = omitTrailingPadding || !sideTrailingPadding ? '' : applyColorsWithOverride(sideTrailingPadding, undefined, elem.widget?.backgroundColor);
