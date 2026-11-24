@@ -23,6 +23,15 @@ assistant's runtime, config files, credentials, or transcript format.
 - Use isolated settings and `CODEX_HOME` for integration checks. Do not write
   to the developer's Codex config just to smoke-test the provider.
 
+## Branches and pull requests
+
+Start each new repository change on its own branch from the latest
+`origin/main`. Fetch first, fast-forward local `main` when possible, and
+avoid carrying changes from another task branch. After validation, commit
+and push the task branch and open a pull request into `main`. Do not merge
+it unless asked. Skip Git changes for local settings work or when the user
+asks to keep the work local.
+
 ## Project map
 
 | Area | Location |
