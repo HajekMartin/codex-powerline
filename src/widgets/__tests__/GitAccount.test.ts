@@ -1,55 +1,87 @@
-import { execFileSync } from 'node:child_process';
+import type * as childProcess from 'node:child_process';
 import * as fs from 'node:fs';
+import { createRequire } from 'node:module';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
+    afterAll,
     afterEach,
+    beforeAll,
     beforeEach,
     describe,
     expect,
     it
 } from 'vitest';
 
-import type { RenderContext } from '../../types/RenderContext';
 import { DEFAULT_SETTINGS } from '../../types/Settings';
 import type { WidgetItem } from '../../types/Widget';
-import { clearGitCache } from '../../utils/git';
 import { getWidget } from '../../utils/widgets';
 import { GitAccountWidget } from '../GitAccount';
 
 const widget = new GitAccountWidget();
 const item: WidgetItem = { id: 'account', type: 'git-account' };
 
-// Run against real Git with isolated configuration: neither read nor modify
-// the developer's account settings.
+// Other suites mock child_process globally under Bun. Use real Git for fixture
+// setup and run the live widget in a fresh process, as in git-conflicts.test.ts.
+const require = createRequire(import.meta.url);
+const { execFileSync } = require('node:child_process') as typeof childProcess;
+
 describe('Git Account', () => {
+    let probeDirectory: string;
+    let probePath: string;
     let directory: string;
     let repository: string;
-    let context: RenderContext;
-    let originalEnv: NodeJS.ProcessEnv;
+    let env: NodeJS.ProcessEnv;
 
     function git(...args: string[]): string {
-        return execFileSync('git', args, { cwd: repository, encoding: 'utf8' });
+        return execFileSync('git', args, { cwd: repository, encoding: 'utf8', env });
     }
 
+    function render(widgetItem = item, cwd = repository): unknown {
+        const output = execFileSync(process.execPath, [probePath, cwd, JSON.stringify(widgetItem)], { encoding: 'utf8', env });
+        return JSON.parse(output);
+    }
+
+    beforeAll(() => {
+        probeDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'powerline-git-account-probe-'));
+        const entryPath = path.join(probeDirectory, 'probe.ts');
+        probePath = path.join(probeDirectory, 'probe.mjs');
+        const modulePath = (relative: string) => JSON.stringify(fileURLToPath(new URL(relative, import.meta.url)));
+        fs.writeFileSync(entryPath, `
+            import { GitAccountWidget } from ${modulePath('../GitAccount.ts')};
+            import { DEFAULT_SETTINGS } from ${modulePath('../../types/Settings.ts')};
+            const [, , cwd, rawItem] = process.argv;
+            const output = new GitAccountWidget().render(JSON.parse(rawItem), { data: { cwd } }, DEFAULT_SETTINGS);
+            console.log(JSON.stringify(output));
+        `);
+        const bun = typeof Bun === 'undefined' ? 'bun' : process.execPath;
+        execFileSync(bun, ['build', entryPath, '--target=node', `--outfile=${probePath}`], { stdio: 'pipe' });
+    });
+
+    afterAll(() => {
+        if (probeDirectory)
+            fs.rmSync(probeDirectory, { recursive: true, force: true });
+    });
+
     beforeEach(() => {
-        originalEnv = { ...process.env };
         directory = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'powerline-git-account-')));
         repository = path.join(directory, 'repo');
         fs.mkdirSync(repository);
-        process.env = Object.fromEntries(Object.entries(originalEnv).filter(([key]) => !key.startsWith('GIT_')));
-        process.env.GIT_CONFIG_NOSYSTEM = '1';
-        process.env.GIT_CONFIG_GLOBAL = path.join(directory, 'gitconfig');
-        process.env.CODEX_HOME = path.join(directory, 'codex');
-        fs.writeFileSync(process.env.GIT_CONFIG_GLOBAL, '');
+        const globalConfig = path.join(directory, 'gitconfig');
+        env = {
+            ...Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.toUpperCase().startsWith('GIT_'))),
+            HOME: directory,
+            USERPROFILE: directory,
+            GIT_CONFIG_NOSYSTEM: '1',
+            GIT_CONFIG_GLOBAL: globalConfig,
+            CODEX_HOME: path.join(directory, 'codex')
+        };
+        fs.writeFileSync(globalConfig, '');
         git('init', '--quiet');
-        context = { data: { cwd: repository } };
-        clearGitCache();
     });
 
     afterEach(() => {
-        process.env = originalEnv;
-        clearGitCache();
         fs.rmSync(directory, { recursive: true, force: true });
     });
 
@@ -64,28 +96,28 @@ describe('Git Account', () => {
         git('config', '--global', 'user.email', 'personal@example.com');
         git('config', '--local', 'user.email', 'work@example.com');
         git('remote', 'add', 'origin', 'git@github.com:someone-else/repo.git');
-        expect(widget.render(item, context, DEFAULT_SETTINGS)).toBe('Git: work@example.com');
-        expect(widget.render({ ...item, rawValue: true }, context, DEFAULT_SETTINGS)).toBe('work@example.com');
-        expect(widget.render({ ...item, metadata: { label: 'Account: ' } }, context, DEFAULT_SETTINGS)).toBe('Account: work@example.com');
+        expect(render()).toBe('Git: work@example.com');
+        expect(render({ ...item, rawValue: true })).toBe('work@example.com');
+        expect(render({ ...item, metadata: { label: 'Account: ' } })).toBe('Account: work@example.com');
     });
 
     it('resolves conditional includes for the active project', () => {
         const includedConfig = path.join(directory, 'work.gitconfig');
         fs.writeFileSync(includedConfig, '[user]\n email = included@work.com\n');
         git('config', '--global', 'user.email', 'personal@example.com');
-        git('config', '--global', `includeIf.gitdir:${repository}/.git.path`, includedConfig);
-        expect(widget.render(item, context, DEFAULT_SETTINGS)).toBe('Git: included@work.com');
+        const gitDir = git('rev-parse', '--absolute-git-dir').trim();
+        git('config', '--global', `includeIf.gitdir:${gitDir}.path`, includedConfig);
+        expect(render()).toBe('Git: included@work.com');
     });
 
     it('falls back to the configured name when email is missing', () => {
         git('config', 'user.name', 'Work Account');
-        expect(widget.render(item, context, DEFAULT_SETTINGS)).toBe('Git: Work Account');
+        expect(render()).toBe('Git: Work Account');
     });
 
     it('hides an unknown identity and respects no-git hiding', () => {
-        expect(widget.render(item, context, DEFAULT_SETTINGS)).toBeNull();
-        const outside = { data: { cwd: directory } };
-        expect(widget.render(item, outside, DEFAULT_SETTINGS)).toBe('(no git)');
-        expect(widget.render({ ...item, metadata: { hide: 'no-git' } }, outside, DEFAULT_SETTINGS)).toBeNull();
+        expect(render()).toBeNull();
+        expect(render(item, directory)).toBe('(no git)');
+        expect(render({ ...item, metadata: { hide: 'no-git' } }, directory)).toBeNull();
     });
 });
