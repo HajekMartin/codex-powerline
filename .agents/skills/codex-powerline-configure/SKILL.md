@@ -45,3 +45,13 @@ source CLI only when the user wants to configure a checkout.
    `codex-powerline --config "<saved-path>" run`. For the default layout,
    `codex-powerline run` is enough. Do not start an interactive session to
    check settings.
+
+## Share a repository preset
+
+For a shared preset such as Author’s Favorite, follow the branch and pull
+request workflow in `AGENTS.md`: fetch `origin/main`, start a new branch
+from it, and open a pull request into `main` after checking the preset.
+Keep local-only config edits out of Git. When using a personal layout as
+the source, copy its portable widgets and styling, not machine-specific
+paths, credentials, or installation settings. Use the checkout CLI to
+check options added on `main` but not yet in the npm package.
