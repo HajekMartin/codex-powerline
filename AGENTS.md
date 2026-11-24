@@ -39,6 +39,8 @@ supported local source. Keep README examples usable from an unpublished checkout
 
 ## Project skills
 
+- [codex-powerline-configure](.agents/skills/codex-powerline-configure/SKILL.md):
+  create and preview a user's Powerline settings without the interactive editor.
 - [codex-powerline-widgets](.agents/skills/codex-powerline-widgets/SKILL.md):
   add or change widgets, editor previews, themes, and renderer behavior.
 - [codex-powerline-cli](.agents/skills/codex-powerline-cli/SKILL.md):

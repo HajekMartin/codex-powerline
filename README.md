@@ -136,6 +136,11 @@ Import [Author’s Favorite](configTemplates/authors-favorite.json) for a Catppu
 
 ## Development
 
+To set up a layout without the interactive editor, open this checkout in Codex and ask:
+
+> Use `$codex-powerline-configure` to create a two-row layout with my model,
+> reasoning effort, Git branch, and usage limits.
+
 To run from a checkout instead of npm, install Bun and run:
 
 ```sh

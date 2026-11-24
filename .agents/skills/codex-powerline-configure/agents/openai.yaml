@@ -1,0 +1,3 @@
+interface:
+  display_name: "Configure Codex Powerline"
+  short_description: "Create a Powerline layout from a plain-language request"
