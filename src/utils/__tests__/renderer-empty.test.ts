@@ -13,7 +13,11 @@ const text = (id: string, customText: string): WidgetItem => ({ id, type: 'custo
 const empty: WidgetItem = { id: 'blank', type: 'empty', backgroundColor: 'bgRed' };
 
 describe('Empty widget rendering', () => {
-    it.each([false, true])('uses the terminal background with Powerline enabled: %s', async (powerline) => {
+    it.each([
+        { name: 'plain', powerline: false, invertSeparator: false },
+        { name: 'Powerline', powerline: true, invertSeparator: false },
+        { name: 'Powerline with left-pointing separators', powerline: true, invertSeparator: true }
+    ])('uses the terminal background in $name', async ({ powerline, invertSeparator }) => {
         const lines = [
             [text('left', 'left'), text('middle', 'middle'), text('right', 'right')],
             [text('left', 'left'), empty, text('right', 'right')]
@@ -28,7 +32,9 @@ describe('Empty widget rendering', () => {
                 ...DEFAULT_SETTINGS.powerline,
                 enabled: powerline,
                 autoAlign: true,
-                theme: 'catppuccin'
+                theme: 'catppuccin',
+                separators: [invertSeparator ? '\uE0B2' : '\uE0B0'],
+                separatorInvertBackground: [invertSeparator]
             }
         }, 80);
         const terminal = new xterm.Terminal({ cols: 80, rows: 4, allowProposedApi: true });
@@ -52,6 +58,15 @@ describe('Empty widget rendering', () => {
                 expect(emptyText.indexOf('right')).toBe(filledText.indexOf('right'));
                 expect(emptyLine?.getCell(emptyText.indexOf('right'))?.getBgColor())
                     .toBe(filledLine?.getCell(filledText.indexOf('right'))?.getBgColor());
+
+                const separator = emptyLine?.getCell(invertSeparator ? gapStart - 1 : gapStart + gapWidth);
+                const neighbor = emptyLine?.getCell(emptyText.indexOf(invertSeparator ? 'left' : 'right'));
+                expect(separator?.getChars()).toBe(invertSeparator ? '\uE0B2' : '\uE0B0');
+                expect(separator?.isInverse()).toBeTruthy();
+                expect(separator?.isBgDefault()).toBe(true);
+                expect(separator?.getFgColor()).toBe(neighbor?.getBgColor());
+                expect(neighbor?.isInverse()).toBeFalsy();
+                expect(emptyLine?.getCell(emptyText.indexOf('right'))?.isInverse()).toBeFalsy();
             }
         } finally {
             terminal.dispose();

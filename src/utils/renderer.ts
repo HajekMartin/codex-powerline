@@ -605,8 +605,16 @@ function renderPowerlineStatusLine(
 
             // Check if adjacent widgets have the same background color
             const sameBackground = widget.bgColor && nextWidget.bgColor && widget.bgColor === nextWidget.bgColor;
+            const [glyphSide, surroundingSide] = shouldInvert ? [nextWidget, widget] : [widget, nextWidget];
+            const reverseFgCode = glyphSide.widget.type === 'empty'
+                ? getColorAnsiCode(bgToFg(surroundingSide.bgColor), colorLevel, false)
+                : '';
 
-            if (shouldInvert) {
+            if (reverseFgCode) {
+                // Reverse video draws the terminal's default background as the glyph,
+                // with the neighboring widget's color filling the rest of the cell.
+                separatorOutput = reverseFgCode + '\x1b[7m' + separator + '\x1b[27m\x1b[39m';
+            } else if (shouldInvert) {
                 // Inverted: swap fg/bg logic
                 if (widget.bgColor && nextWidget.bgColor) {
                     if (sameBackground) {
