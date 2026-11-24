@@ -431,6 +431,14 @@ export function handleNormalInputMode({
             newWidgets[selectedIndex] = { ...currentWidget, rawValue: !currentWidget.rawValue };
             onUpdate(newWidgets);
         }
+    } else if (shortcut === 'R') {
+        const currentWidget = widgets[selectedIndex];
+        if (currentWidget && getWidget(currentWidget.type)) {
+            const { reserveSpace, ...rest } = currentWidget;
+            const newWidgets = [...widgets];
+            newWidgets[selectedIndex] = reserveSpace ? rest : { ...rest, reserveSpace: true };
+            onUpdate(newWidgets);
+        }
     } else if (shortcut === 'm' && widgets.length > 0) {
         const currentWidget = widgets[selectedIndex];
         // The last widget has nothing to merge into, so there m only clears a

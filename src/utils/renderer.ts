@@ -918,9 +918,15 @@ export function preRenderAllWidgets(
 
             // Store the rendered content without padding (padding is applied later)
             // Use stringWidth to properly calculate Unicode character display width
-            const plainLength = getVisibleWidth(widgetText);
+            const textWidth = getVisibleWidth(widgetText);
+            let plainLength = textWidth;
+            if (widget.reserveSpace && !context.isPreview) {
+                // Use the preview only to size the cell, never as live data.
+                const sample = sanitizeTerminalText(widgetImpl.render(effectiveWidget, { isPreview: true }, settings) ?? '');
+                plainLength = Math.max(textWidth, getVisibleWidth(sample), 1);
+            }
             preRenderedLine.push({
-                content: widgetText,
+                content: widgetText + ' '.repeat(plainLength - textWidth),
                 plainLength,
                 widget
             });

@@ -541,6 +541,31 @@ describe('items-editor input handlers', () => {
         expect(updated?.[0]?.character).toBe('-');
     });
 
+    it('uses Shift+R to toggle space reservation without changing raw value', () => {
+        const widget: WidgetItem = { id: '1', type: 'context-bar', rawValue: true };
+        const args = {
+            input: 'R',
+            key: { shift: true },
+            widgets: [widget],
+            selectedIndex: 0,
+            separatorChars: ['|', '-'],
+            onBack: vi.fn(),
+            onUpdate: vi.fn(),
+            setSelectedIndex: vi.fn(),
+            setMoveMode: vi.fn(),
+            setShowClearConfirm: vi.fn(),
+            openWidgetPicker: vi.fn(),
+            getCustomKeybindsForWidget: () => [],
+            setCustomEditorWidget: vi.fn()
+        };
+
+        handleNormalInputMode(args);
+        expect(args.onUpdate).toHaveBeenLastCalledWith([{ ...widget, reserveSpace: true }]);
+
+        handleNormalInputMode({ ...args, widgets: [{ ...widget, reserveSpace: true }] });
+        expect(args.onUpdate).toHaveBeenLastCalledWith([widget]);
+    });
+
     it('toggles auto-align exclusion when the editor marks it available', () => {
         const widgets: WidgetItem[] = [
             { id: '1', type: 'tokens-input' }

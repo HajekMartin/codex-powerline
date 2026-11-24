@@ -268,19 +268,11 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({
     const isSeparator = currentWidget?.type === 'separator';
     const isFlexSeparator = currentWidget?.type === 'flex-separator';
 
-    // Check if widget supports raw value using registry
-    let canToggleRaw = false;
-    let customKeybinds: CustomKeybind[] = [];
-    if (currentWidget && !isSeparator && !isFlexSeparator) {
-        const widgetImpl = getWidget(currentWidget.type);
-        if (widgetImpl) {
-            canToggleRaw = widgetImpl.supportsRawValue();
-            // Get custom keybinds from the widget
-            customKeybinds = getCustomKeybindsForWidget(widgetImpl, currentWidget);
-        } else {
-            canToggleRaw = false;
-        }
-    }
+    const currentWidgetImpl = currentWidget ? getWidget(currentWidget.type) : null;
+    const canToggleRaw = currentWidgetImpl?.supportsRawValue() ?? false;
+    const customKeybinds = currentWidget && currentWidgetImpl
+        ? getCustomKeybindsForWidget(currentWidgetImpl, currentWidget)
+        : [];
 
     // On the last widget, m only clears a merge left there
     const canMerge = currentWidget && (selectedIndex < widgets.length - 1 || Boolean(currentWidget.merge))
@@ -433,6 +425,9 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({
     }
     if (canToggleRaw) {
         helpText += ', (r)aw value';
+    }
+    if (currentWidgetImpl) {
+        helpText += ', Shift+R reserve space';
     }
     if (canMerge) {
         helpText += ', (m)erge';
@@ -755,6 +750,7 @@ export const ItemsEditor: React.FC<ItemsEditorProps> = ({
                                                 </Text>
                                             )}
                                             {supportsRawValue && widget.rawValue && <Text dimColor> (raw value)</Text>}
+                                            {widgetImpl && widget.reserveSpace && <Text dimColor> (reserve space)</Text>}
                                             {widget.merge === true && <Text dimColor> (merged→)</Text>}
                                             {widget.merge === 'no-padding' && <Text dimColor> (merged-no-pad→)</Text>}
                                             {widget.excludeFromAutoAlign && settings.powerline.enabled && settings.powerline.autoAlign && !isMergedIntoPreviousWidget(widgets, index) && <Text dimColor> (no-align)</Text>}
