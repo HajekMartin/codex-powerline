@@ -17,8 +17,14 @@ function makeContext(fastMode?: boolean | null, overrides: Partial<RenderContext
     return { data: fastMode === undefined ? {} : { fast_mode: fastMode }, ...overrides };
 }
 
-function render(item: WidgetItem, context: RenderContext): string | null {
-    return new FastModeWidget().render(item, context, DEFAULT_SETTINGS);
+function render(item: WidgetItem, context: RenderContext, platform: NodeJS.Platform = 'darwin'): string | null {
+    const originalPlatform = process.platform;
+    Object.defineProperty(process, 'platform', { value: platform });
+    try {
+        return new FastModeWidget().render(item, context, DEFAULT_SETTINGS);
+    } finally {
+        Object.defineProperty(process, 'platform', { value: originalPlatform });
+    }
 }
 
 describe('FastModeWidget', () => {
@@ -169,6 +175,23 @@ describe('FastModeWidget', () => {
 
         it('renders the flash glyph alone when ON (nerd font)', () => {
             expect(render(FORMAT_NERD_ITEM, makeContext(true))).toBe('\u{F0241}');
+        });
+    });
+
+    describe('render() on Windows', () => {
+        const nerdItem: WidgetItem = { ...ITEM, metadata: { nerdFont: 'true' } };
+
+        it('uses the standard text bolt in both preview and live output, even with a saved Nerd Font setting', () => {
+            expect(render(ITEM, makeContext(false), 'win32')).toBe('\u26A1\uFE0E off');
+            expect(render(nerdItem, makeContext(false), 'win32')).toBe('\u26A1\uFE0E off');
+            expect(render(nerdItem, makeContext(true), 'win32')).toBe('\u26A1\uFE0E on');
+            expect(render(nerdItem, makeContext(undefined, { isPreview: true }), 'win32')).toBe('\u26A1\uFE0E on');
+        });
+
+        it('keeps the on and off states distinct in icon format', () => {
+            const item: WidgetItem = { ...nerdItem, metadata: { ...nerdItem.metadata, format: 'icon' } };
+            expect(render(item, makeContext(false), 'win32')).toBe('\u26A1\uFE0E ○');
+            expect(render(item, makeContext(true), 'win32')).toBe('\u26A1\uFE0E ◉');
         });
     });
 
