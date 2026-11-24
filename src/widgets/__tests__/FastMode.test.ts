@@ -181,17 +181,17 @@ describe('FastModeWidget', () => {
     describe('render() on Windows', () => {
         const nerdItem: WidgetItem = { ...ITEM, metadata: { nerdFont: 'true' } };
 
-        it('uses the standard text bolt in both preview and live output, even with a saved Nerd Font setting', () => {
-            expect(render(ITEM, makeContext(false), 'win32')).toBe('\u26A1\uFE0E off');
-            expect(render(nerdItem, makeContext(false), 'win32')).toBe('\u26A1\uFE0E off');
-            expect(render(nerdItem, makeContext(true), 'win32')).toBe('\u26A1\uFE0E on');
-            expect(render(nerdItem, makeContext(undefined, { isPreview: true }), 'win32')).toBe('\u26A1\uFE0E on');
+        it('omits the width-changing variation selector in preview and live output on Windows', () => {
+            expect(render(ITEM, makeContext(false), 'win32')).toBe('\u26A1 off');
+            expect(render(nerdItem, makeContext(false), 'win32')).toBe('\u26A1 off');
+            expect(render(nerdItem, makeContext(true), 'win32')).toBe('\u26A1 on');
+            expect(render(nerdItem, makeContext(undefined, { isPreview: true }), 'win32')).toBe('\u26A1 on');
         });
 
         it('keeps the on and off states distinct in icon format', () => {
             const item: WidgetItem = { ...nerdItem, metadata: { ...nerdItem.metadata, format: 'icon' } };
-            expect(render(item, makeContext(false), 'win32')).toBe('\u26A1\uFE0E ○');
-            expect(render(item, makeContext(true), 'win32')).toBe('\u26A1\uFE0E ◉');
+            expect(render(item, makeContext(false), 'win32')).toBe('\u26A1 ○');
+            expect(render(item, makeContext(true), 'win32')).toBe('\u26A1 ◉');
         });
     });
 

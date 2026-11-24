@@ -19,7 +19,6 @@ import { isHidden } from './shared/hideable';
 import { isNerdFontEnabled } from './shared/metadata';
 
 const BOLT_EMOJI = '⚡';
-const BOLT_TEXT = '\u26A1\uFE0E';
 const FLASH_NERD_FONT = '󰉁'; // nf-md-flash (U+F0241)
 const FLASH_OFF_NERD_FONT = '󰉃'; // nf-md-flash_off (U+F0243)
 const STATE_DOT_OFF = '○';
@@ -45,7 +44,7 @@ const FORMAT_OPTIONS: FormatOptions<FastModeFormat> = {
 
 function getIcon(enabled: boolean, nerdFont: boolean): string {
     if (!nerdFont) {
-        return process.platform === 'win32' ? BOLT_TEXT : BOLT_EMOJI;
+        return BOLT_EMOJI;
     }
     return enabled ? FLASH_NERD_FONT : FLASH_OFF_NERD_FONT;
 }
@@ -95,7 +94,8 @@ export class FastModeWidget implements Widget {
         const format = getFormat(item, FORMAT_OPTIONS);
         // Windows terminals can show Powerline separators without a font that
         // contains the private-use Nerd Font bolts. Keep the saved preference
-        // for other platforms but use the standard bolt on Windows.
+        // for other platforms but use the standard bolt on Windows. Do not
+        // add a variation selector: Windows ConPTY counts it as another cell.
         const nerdFont = process.platform !== 'win32' && isNerdFontEnabled(item, FORMAT_OPTIONS);
 
         if (context.isPreview) {
