@@ -34,12 +34,34 @@ Give a ⭐ if this project helped you!
   - [Windows](#-windows)
   - [macOS](#-macos)
   - [Linux](#-linux)
+- [Configure with Codex](#configure-with-codex)
 - [Features](#-features)
 - [Contributing](#-contributing)
 - [Changelog](CHANGELOG.md)
 - [Development](#development)
 - [Author and Acknowledgments](#author-and-acknowledgments)
 - [License](#license)
+
+## Configure with Codex
+
+The [Configure Powerline skill](.agents/skills/codex-powerline-configure/)
+turns a description of your status bar into a saved layout and a preview.
+It works with the npm install on Windows, macOS, and Linux. No repository
+checkout, interactive Powerline editor, or MCP server is needed.
+
+1. [Install Powerline](#-install) if needed. Skip `codex-powerline configure`.
+2. In Codex, download the skill by asking:
+
+   > Use `$skill-installer` to install the skill from
+   > https://github.com/HajekMartin/codex-powerline/tree/main/.agents/skills/codex-powerline-configure
+
+3. In your next Codex message, describe your layout:
+
+   > Use `$codex-powerline-configure` to make a two-row layout with my model,
+   > reasoning effort, Git branch, and usage limits.
+
+Codex saves the layout separately and gives you the launch command. Add
+“make it my default” if you want `codex-powerline run` to use it automatically.
 
 ## 🚀 Install
 
@@ -135,11 +157,6 @@ Uninstalling Powerline keeps Codex CLI, your saved layout, and installed fonts.
 Import [Author’s Favorite](configTemplates/authors-favorite.json) for a Catppuccin layout with four aligned columns for Codex, context, usage and workspace, and Git.
 
 ## Development
-
-To set up a layout without the interactive editor, open this checkout in Codex and ask:
-
-> Use `$codex-powerline-configure` to create a two-row layout with my model,
-> reasoning effort, Git branch, and usage limits.
 
 To run from a checkout instead of npm, install Bun and run:
 
