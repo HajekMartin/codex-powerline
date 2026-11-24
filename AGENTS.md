@@ -11,14 +11,14 @@ assistant's runtime, config files, credentials, or transcript format.
 - Run the editor from source with `bun run start configure`.
 - Use `bun test <path>` for a focused check and `bun test` for the full suite.
 - Keep release notes in `CHANGELOG.md`, not in the README.
-- Keep npm publishing instructions in the release skill, not in the README.
+- Use the release skill to prepare and validate npm packages without publishing.
 - Keep the README short. Give each supported platform one self-contained section
   with copy-paste commands for install, first launch, update, and uninstall.
   Link to prerequisite installers instead of duplicating their instructions.
 - Run `bun run lint` and `bun run build` before completing runtime changes.
 - Test the built Node entry point as well as source when you change a launch
   path. The published package runs on Node.js, while Bun builds it.
-- When the user asks to keep their macOS development install current, refresh
+- When the user asks to keep their development install current, refresh
   it after runtime changes using the local-install skill.
 - Use isolated settings and `CODEX_HOME` for integration checks. Do not write
   to the developer's Codex config just to smoke-test the provider.
@@ -46,6 +46,6 @@ supported local source. Keep README examples usable from an unpublished checkout
 - [codex-powerline-cli](.agents/skills/codex-powerline-cli/SKILL.md):
   change or test the multiline launcher, App Server bridge, or telemetry adapter.
 - [codex-powerline-local-install](.agents/skills/codex-powerline-local-install/SKILL.md):
-  build, install, and verify the current checkout on macOS.
+  build, install, and verify the current checkout on Windows or macOS.
 - [codex-powerline-release](.agents/skills/codex-powerline-release/SKILL.md):
-  prepare versions and release notes, validate packages, and publish to npm.
+  prepare versions and release notes, and validate packages without publishing.
