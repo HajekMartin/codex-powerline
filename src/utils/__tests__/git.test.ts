@@ -16,6 +16,7 @@ import * as executablePath from '../executable-path';
 import {
     clearGitCache,
     execGit,
+    getGitAheadBehind,
     getGitChangeCounts,
     getGitConflictCount,
     getGitFileStatusCounts,
@@ -403,6 +404,36 @@ describe('git utils', () => {
 
             expect(runGit('symbolic-ref --short HEAD', context)).toBe('old-value');
             expect(mockExecFileSync.mock.calls).toHaveLength(1);
+        });
+
+        it('refreshes cached divergence when upstream moves without touching HEAD or the index', () => {
+            const home = useTempHome();
+            const { root } = createGitRepo();
+            const context: RenderContext = { data: { cwd: root }, gitCacheTtlSeconds: 0 };
+            const head = 'a'.repeat(40);
+            const before = `${head}\n${'b'.repeat(40)}\n`;
+            const after = `${head}\n${'c'.repeat(40)}\n`;
+
+            mockExecFileSync.mockReturnValueOnce('');
+            expect(getGitAheadBehind(context)).toBeNull();
+
+            mockExecFileSync.mockReturnValueOnce(before);
+            mockExecFileSync.mockReturnValueOnce('0\t0\n');
+            expect(getGitAheadBehind(context)).toEqual({ ahead: 0, behind: 0 });
+            clearGitCache();
+            mockExecFileSync.mockReturnValueOnce(before);
+            expect(getGitAheadBehind(context)).toEqual({ ahead: 0, behind: 0 });
+            expect(mockExecFileSync.mock.calls).toHaveLength(4);
+
+            clearGitCache();
+            mockExecFileSync.mockReturnValueOnce(after);
+            mockExecFileSync.mockReturnValueOnce('0\t3\n');
+            expect(getGitAheadBehind(context)).toEqual({ ahead: 0, behind: 3 });
+            expect(mockExecFileSync.mock.calls[5]?.[1]).toEqual([
+                ...GIT_HARDENING_ARGS,
+                'rev-list', '--left-right', '--count', `${head}...${'c'.repeat(40)}`
+            ]);
+            expect(Object.keys(readGitCacheJson(home).entries ?? {})).toHaveLength(1);
         });
 
         it('invalidates cached output when HEAD or index mtimes change', () => {
