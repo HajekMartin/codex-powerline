@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.2
 
 - Add the optional Chat Status widget (`chat-status`) for the active chat in
   `codex-powerline run`. It shows when Codex is running, waiting for approval or
@@ -9,14 +9,15 @@
 - Add Git Account (`git-account`) to show the active project’s configured Git
   email, falling back to its user name. Respects repository overrides and
   conditional includes; this identity can differ from push authentication.
+- Add the Author’s Favorite preset with four aligned columns.
+
+## 1.0.1
 
 - Bundle MesloLGS Nerd Font Mono and its licenses. macOS npm installation
   installs the font offline and selects it for the calling Apple Terminal
   profile, with a first-launch retry when install scripts were skipped.
 - Fix macOS startup failures when node-pty's terminal helper is installed
   without execute permission. Repair the permission before starting Codex.
-
-## 1.0.1
 
 - Added `bun run release` and `bun run release:dry-run` to validate, build, and
   publish the npm package, including checks of the built Node entry point.
