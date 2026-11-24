@@ -25,6 +25,12 @@ const mockExecFileSync = execFileSync as unknown as {
     mockReturnValueOnce: (value: string) => void;
 };
 
+function mockDivergence(count: string): void {
+    mockExecFileSync.mockReturnValueOnce('true\n');
+    mockExecFileSync.mockReturnValueOnce(`${'a'.repeat(40)}\n${'b'.repeat(40)}\n`);
+    mockExecFileSync.mockReturnValueOnce(count);
+}
+
 function render(options: {
     metadata?: Record<string, string>;
     rawValue?: boolean;
@@ -63,8 +69,7 @@ describe('GitAheadBehindWidget', () => {
     });
 
     it('renders divergence counts', () => {
-        mockExecFileSync.mockReturnValueOnce('true\n');
-        mockExecFileSync.mockReturnValueOnce('2\t3\n');
+        mockDivergence('2\t3\n');
 
         expect(render()).toBe('↑2↓3');
     });
@@ -90,20 +95,17 @@ describe('GitAheadBehindWidget', () => {
     });
 
     it('hides when not diverged by default', () => {
-        mockExecFileSync.mockReturnValueOnce('true\n');
-        mockExecFileSync.mockReturnValueOnce('0\t0\n');
+        mockDivergence('0\t0\n');
 
         expect(render()).toBeNull();
     });
 
     it('shows zero divergence when the zero state is opted out', () => {
-        mockExecFileSync.mockReturnValueOnce('true\n');
-        mockExecFileSync.mockReturnValueOnce('0\t0\n');
+        mockDivergence('0\t0\n');
         expect(render({ metadata: { hide: '' } })).toBe('↑0↓0');
 
         clearGitCache();
-        mockExecFileSync.mockReturnValueOnce('true\n');
-        mockExecFileSync.mockReturnValueOnce('0\t0\n');
+        mockDivergence('0\t0\n');
         expect(render({ metadata: { hide: 'no-git' }, rawValue: true })).toBe('0,0');
     });
 });

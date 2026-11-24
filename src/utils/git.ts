@@ -36,6 +36,7 @@ interface GitCacheEntry {
     createdAt: number;
     headMtimeMs: number | null;
     indexMtimeMs: number | null;
+    revisionRange?: string;
 }
 
 interface PersistentGitCache {
@@ -361,15 +362,20 @@ function isCacheEntry(value: unknown): value is GitCacheEntry {
     return (typeof entry.output === 'string' || entry.output === null)
         && typeof entry.createdAt === 'number'
         && (typeof entry.headMtimeMs === 'number' || entry.headMtimeMs === null)
-        && (typeof entry.indexMtimeMs === 'number' || entry.indexMtimeMs === null);
+        && (typeof entry.indexMtimeMs === 'number' || entry.indexMtimeMs === null)
+        && (typeof entry.revisionRange === 'string' || entry.revisionRange === undefined);
 }
 
 function isCacheEntryFresh(
     entry: GitCacheEntry,
     metadata: GitRepoMetadata | null,
     ttlMs: number,
-    now: number
+    now: number,
+    revisionRange?: string
 ): boolean {
+    if (entry.revisionRange !== revisionRange)
+        return false;
+
     if (metadata) {
         if (entry.headMtimeMs !== metadata.headMtimeMs || entry.indexMtimeMs !== metadata.indexMtimeMs) {
             return false;
@@ -441,7 +447,8 @@ function readPersistentCacheEntry(
     cacheKey: string,
     cwd: string | undefined,
     ttlMs: number,
-    now: number
+    now: number,
+    revisionRange?: string
 ): GitCacheEntry | null {
     if (!metadata) {
         return null;
@@ -453,7 +460,7 @@ function readPersistentCacheEntry(
     }
 
     const entry = cache.entries[cacheKey];
-    if (!entry || !isCacheEntryFresh(entry, metadata, ttlMs, now)) {
+    if (!entry || !isCacheEntryFresh(entry, metadata, ttlMs, now, revisionRange)) {
         return null;
     }
 
@@ -518,7 +525,13 @@ export function runGitArgs(args: string[], context: RenderContext, cacheCommand?
     return runGitArgsEncoded(args, context, cacheCommand, 'utf8');
 }
 
-function runGitArgsEncoded(args: string[], context: RenderContext, cacheCommand: string | undefined, encoding: 'utf8' | 'latin1'): string | null {
+function runGitArgsEncoded(
+    args: string[],
+    context: RenderContext,
+    cacheCommand: string | undefined,
+    encoding: 'utf8' | 'latin1',
+    revisionRange?: string
+): string | null {
     const cwd = resolveGitCwd(context);
     const commandToken = cacheCommand ?? args.join('\0');
     // Byte-preserving output must never reuse an older, lossy UTF-8 entry.
@@ -537,11 +550,11 @@ function runGitArgsEncoded(args: string[], context: RenderContext, cacheCommand:
 
     // Check cache first
     const memoryEntry = gitCommandCache.get(memoryCacheKey);
-    if (memoryEntry && isCacheEntryFresh(memoryEntry, metadata, ttlMs, now)) {
+    if (memoryEntry && isCacheEntryFresh(memoryEntry, metadata, ttlMs, now, revisionRange)) {
         return memoryEntry.output;
     }
 
-    const persistentEntry = readPersistentCacheEntry(metadata, persistentCacheKey, cwd, ttlMs, now);
+    const persistentEntry = readPersistentCacheEntry(metadata, persistentCacheKey, cwd, ttlMs, now, revisionRange);
     if (persistentEntry) {
         gitCommandCache.set(memoryCacheKey, persistentEntry);
         return persistentEntry.output;
@@ -560,6 +573,7 @@ function runGitArgsEncoded(args: string[], context: RenderContext, cacheCommand:
     // large repository, or one cut off by the timeout) still gets the full TTL
     // of reuse rather than expiring the moment it returns.
     const entry = createCacheEntry(result, metadata, Date.now());
+    entry.revisionRange = revisionRange;
     gitCommandCache.set(memoryCacheKey, entry);
     writePersistentCacheEntry(metadata, persistentCacheKey, cwd, entry);
     return result;
@@ -688,8 +702,29 @@ export interface GitAheadBehind {
     behind: number;
 }
 
+const COMMIT_OID_PATTERN = /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/;
+
 export function getGitAheadBehind(context: RenderContext): GitAheadBehind | null {
-    const output = runGit('rev-list --left-right --count HEAD...@{upstream}', context);
+    let revisions: string[];
+    try {
+        // Fetch and push can move the upstream without touching HEAD or the index.
+        const refs = execGit(['rev-parse', 'HEAD^{commit}', '@{upstream}^{commit}'], resolveGitCwd(context));
+        revisions = refs.trim().split(/\s+/);
+    } catch {
+        return null;
+    }
+
+    if (revisions.length !== 2 || !revisions.every(revision => COMMIT_OID_PATTERN.test(revision)))
+        return null;
+
+    const range = revisions.join('...');
+    const output = runGitArgsEncoded(
+        ['rev-list', '--left-right', '--count', range],
+        context,
+        'rev-list --left-right --count HEAD...@{upstream}',
+        'utf8',
+        range
+    );
     if (!output)
         return null;
 
