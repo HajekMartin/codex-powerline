@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.4
+
+- Add a **Reserve space** option for widgets. It keeps their cells in place
+  when data is missing, such as before a chat reports context usage.
+- Update Author’s Favorite with the Minimal theme, a working-directory row,
+  and four aligned columns. Show Git Ahead/Behind when both counts are zero.
+- Refresh Git Ahead/Behind when the local branch or its upstream moves, even
+  when the Git cache is set to never expire.
+- Fix the Fast Mode lightning symbol and its alignment in Windows terminals.
+- Document how to install a checkout on Windows for local testing.
+
 ## 1.0.3
 
 - Add the Empty widget to leave a gap that shows the terminal background
