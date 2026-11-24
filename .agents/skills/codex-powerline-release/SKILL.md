@@ -1,12 +1,13 @@
 ---
 name: codex-powerline-release
-description: Prepare and publish Codex Powerline npm releases, including version bumps, release notes, package validation, and npm version conflicts. Use for maintainer release work, not end-user installation.
+description: Prepare and validate Codex Powerline releases, including version bumps, release notes, and package dry runs. Use for maintainer release preparation, not npm authentication, publishing, or installation.
 ---
 
 # Codex Powerline releases
 
-Run commands from the repository root. Keep publishing instructions here and
-release notes in `CHANGELOG.md`; the README serves users installing Powerline.
+Run commands from the repository root. Keep release notes in `CHANGELOG.md`.
+This workflow ends once the package is ready for the maintainer. Do not sign
+in to npm or upload a package.
 
 ## Prepare and validate
 
@@ -27,8 +28,9 @@ bun run release:dry-run
 
 This installs locked dependencies, runs lint and the full test suite, builds,
 checks the built Node entry point with `--version` and `--help`, and previews
-the npm upload. Check that the package includes `dist/codex-powerline.js`, its
-chunks, `LICENSE`, and `NOTICE`, and that the built version matches the manifest.
+the package contents without uploading anything. Check that the package
+includes `dist/codex-powerline.js`, its chunks, `LICENSE`, and `NOTICE`, and
+that the built version matches the manifest.
 
 For installer or font changes, also install the packed tarball with a temporary
 `HOME`, `CODEX_HOME`, and npm global prefix. Check that `assets/fonts/` and its
@@ -36,33 +38,14 @@ licenses are packed, that macOS postinstall copies the bundled family, and that
 first launch repairs an installation made with `--ignore-scripts`. Use a
 throwaway Terminal profile for live font-selection checks.
 
-## Publish
+## Check the version
 
-When the user requests publishing, run:
-
-```sh
-bun run release
-```
-
-The same validation runs before uploading the current version. If sign-in is
-needed, use `npm login`; npm handles any required two-factor approval. A request
-to prepare commands or validate a release alone does not authorize an upload.
-
-After a successful upload, verify the version and public tags:
+Use the public npm version list to check whether the planned version is
+already published:
 
 ```sh
 npm view codex-powerline versions --json
-npm view codex-powerline dist-tags --json
 ```
 
-## Version conflicts
-
-npm rejects versions that are already published or staged. A dry run checks
-the build and packaging; it does not guarantee version availability. A staged
-upload is not yet a public release.
-
-On a publish failure, report the error before trying another upload. For a
-version conflict, determine whether the intended artifact is already staged
-or a new version is needed; do not automatically bump and republish. Use the
-[npm staging documentation](https://docs.npmjs.com/cli/v11/commands/npm-stage/)
-when inspecting or approving an existing stage, and verify its contents first.
+Report any published version conflict. The public version list and dry run
+do not establish whether an unpublished version is already staged.
