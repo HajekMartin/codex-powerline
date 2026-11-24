@@ -32,7 +32,7 @@
       { "id": "permissions", "type": "permissions", "backgroundColor": "bgBrightBlue", "metadata": { "label": "" }, "reserveSpace": true },
       { "id": "empty", "type": "empty", "backgroundColor": "bgRed" },
       { "id": "weekly-reset-timer", "type": "weekly-reset-timer", "backgroundColor": "bgBrightMagenta", "metadata": { "label": "Reset:  " }, "reserveSpace": true },
-      { "id": "git-ahead-behind", "type": "git-ahead-behind", "backgroundColor": "bgRed", "reserveSpace": true }
+      { "id": "git-ahead-behind", "type": "git-ahead-behind", "backgroundColor": "bgRed", "metadata": { "hide": "" }, "reserveSpace": true }
     ],
     [
       { "id": "chat-status", "type": "chat-status", "rawValue": true, "reserveSpace": true },
